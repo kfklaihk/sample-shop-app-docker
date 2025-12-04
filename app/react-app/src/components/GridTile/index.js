@@ -6,7 +6,17 @@ import './styles.css'
 export default class GridTile extends Component {
   addToCart = () => {
     const { onAddToCartClicked, productId } = this.props
-    onAddToCartClicked(productId)
+    console.log('Add to cart clicked for product ID:', productId)
+    if (typeof onAddToCartClicked !== 'function') {
+      console.error('onAddToCartClicked is not a function:', onAddToCartClicked)
+      return
+    }
+    try {
+      onAddToCartClicked(productId)
+      console.log('Add to cart action dispatched successfully')
+    } catch (error) {
+      console.error('Error when adding to cart:', error)
+    }
   }
 
   render() {

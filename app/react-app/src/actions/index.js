@@ -56,6 +56,7 @@ export const purchaseOrder = () => (dispatch) => {
 }
 
 export const fetchAllItems = () => (dispatch) => {
+  console.log('Fetching all products from API...');
   let dispatchObj = {
     type: types.ITEMS_REQUEST,
     payload: {
@@ -64,7 +65,14 @@ export const fetchAllItems = () => (dispatch) => {
         .get(`${API}/product/`)
         .accept('application/json')
         .end()
-        .then((res) => res.body)
+        .then((res) => {
+          console.log('Successfully fetched products from API:', res.body);
+          return res.body;
+        })
+        .catch(err => {
+          console.error("Error fetching products from API:", err);
+          return [];
+        })
     },
   }
   return dispatch(dispatchObj)
@@ -207,11 +215,56 @@ export const showAddToCart = () => (dispatch) => {
 }
 
 export const addToCart = productId => (dispatch, getState) => {
-  dispatch(addToCartUnsafe(productId))
-  dispatch(showAddToCart())
-  setTimeout(() => {
-    dispatch(resetItemAdded())
-  }, 2500)
+  console.log('addToCart action called with productId:', productId)
+  try {
+    // Update local store state
+    dispatch(addToCartUnsafe(productId))
+    console.log('addToCartUnsafe dispatched successfully')
+    dispatch(showAddToCart())
+    console.log('showAddToCart dispatched successfully')
+    
+    // Get current cart state
+    const { cart } = getState()
+    console.log('Current cart state:', cart)
+    
+    // Create an order object for the API
+    const orderData = {
+      orderId: 0, // The backend will assign a real ID
+      orderDate: new Date().toISOString(),
+      customerId: 0, // If user is not logged in, use 0 or get from state if logged in
+      productsOrdered: {}
+    }
+    
+    // Add products from cart to the order
+    Object.keys(cart.quantityById).forEach(productId => {
+      orderData.productsOrdered[productId] = cart.quantityById[productId]
+    })
+    
+    console.log('Sending order data to API:', orderData)
+    
+    // Send request to backend API - use the correct endpoint
+    const url = `${API}/order/`
+    console.log('Sending API request to:', url)
+    request
+      .post(url)
+      .set('Content-Type', 'application/json')
+      .accept('application/json')
+      .send(orderData)
+      .end()
+      .then(res => {
+        console.log('Successfully created order on server:', res.body)
+      })
+      .catch(err => {
+        console.error('Error creating order on server:', err)
+      })
+    
+    setTimeout(() => {
+      dispatch(resetItemAdded())
+      console.log('resetItemAdded dispatched after timeout')
+    }, 2500)
+  } catch (error) {
+    console.error('Error in addToCart action:', error)
+  }
 }
 
 export const checkout = products => (dispatch, getState) => {

@@ -9,6 +9,7 @@ import promiseMiddleware from 'redux-promise-middleware'
 import reducer from './reducers'
 import {
   fetchAllDummyItems,
+  fetchAllItems,
   fetchContainerId,
 } from './actions'
 import App from './containers/App'
@@ -39,7 +40,12 @@ const muiTheme = getMuiTheme({
   },
 })
 
-store.dispatch(fetchAllDummyItems())
+store.dispatch(fetchAllItems())
+// Fallback to dummy items if API call fails
+.catch(() => {
+  console.log('Failed to fetch products from API, using dummy data instead');
+  store.dispatch(fetchAllDummyItems());
+})
 store.dispatch(fetchContainerId())
 
 render(

@@ -4,7 +4,9 @@ server:
   contextPath: /
 ---
 spring:
-  profiles: local, default
+  config:
+    activate:
+      on-profile: local,default
 datasource:
   atsea:
     url: jdbc:h2:~/test
@@ -20,7 +22,9 @@ datasource:
       dialect: org.hibernate.dialect.H2Dialect
 ---
 spring:
-  profiles: postgres
+  config:
+    activate:
+      on-profile: postgres
   devtools:
     remote:
       secret: secretkey
@@ -51,7 +55,9 @@ datasource:
       dialect: org.hibernate.dialect.PostgreSQLDialect
 ---
 spring:
-  profiles: mysql
+  config:
+    activate:
+      on-profile: mysql
 datasource:
   atsea:
     url: jdbc:mysql://database:3306/atsea
@@ -67,7 +73,9 @@ datasource:
       dialect: org.hibernate.dialect.MySQLDialect
 ---
 spring:
-  profiles: sqlserver
+  config:
+    activate:
+      on-profile: sqlserver
 datasource:
   atsea:
     url: jdbc:sqlserver://database:1433;databaseName=atsea
@@ -80,6 +88,6 @@ datasource:
       hbm2ddl.method: create-drop
       show_sql: true
       format_sql: true
-      dialect: org.hibernate.dialect.SQLServerDialect      
-      
-      
+      dialect: org.hibernate.dialect.SQLServerDialect
+
+

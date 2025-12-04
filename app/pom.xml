@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>1.5.3.RELEASE</version>
+    <version>3.2.0</version>
   </parent>
 
   <groupId>com.docker.atsea</groupId>
@@ -13,8 +13,9 @@
   <name>atsea</name>
   
   <properties>
-    <java.version>1.8</java.version>
+    <java.version>17</java.version>
     <h2.version>1.4.187</h2.version>
+    <json.simple.version>1.1.1</json.simple.version>
   </properties>
 
   <dependencies>
@@ -23,11 +24,7 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-    <version>4.3.9.RELEASE</version>
-</dependency>
+    <!-- spring-core is included transitively by spring-boot-starter dependencies, so this explicit dependency is not needed and can cause version conflicts. Removed. -->
     <!-- Add freemarker template support -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -37,12 +34,13 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
+      <version>3.2.0</version>
     </dependency>
     <!-- Add Hikari Connection Pooling support -->
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
-      <version>2.5.1</version>
+      <version>5.1.0</version>
     </dependency>
     <!-- Add H2 database support [for running with local profile] -->
     <dependency>
@@ -53,19 +51,26 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
+      <version>42.7.3</version> 
     </dependency>
     <!-- Postgres connection pooling -->
     <dependency>
 		<groupId>org.hibernate</groupId>
-		<artifactId>hibernate-c3p0</artifactId>
-		<version>5.2.10.Final</version>
+		<artifactId>hibernate-core</artifactId>
+		<version>6.4.4.Final</version>
+	</dependency>
+	<dependency>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <version>8.0.1.Final</version>
+    	</dependency>	
+	<dependency>
+    		<groupId>com.mchange</groupId>
+    		<artifactId>c3p0</artifactId>
+    		<version>0.9.5.5</version> <!-- Latest stable version -->
 	</dependency>
     <!-- Add MySQL database support -->
-	<dependency>
-		<groupId>mysql</groupId>
-		<artifactId>mysql-connector-java</artifactId>
-	</dependency>
-	<!-- Add MS SQLServer database support -->
+<!-- Add MS SQLServer database support -->
 	<dependency>
     	<groupId>com.microsoft.sqlserver</groupId>
     	<artifactId>mssql-jdbc</artifactId>
@@ -80,9 +85,17 @@
     	<groupId>org.springframework</groupId>
         <artifactId>spring-jdbc</artifactId>
         </dependency>
+    <!-- Jakarta EE -->
     <dependency>
+        <groupId>jakarta.platform</groupId>
+        <artifactId>jakarta.jakartaee-api</artifactId>
+        <version>10.0.0</version>
+        <scope>provided</scope>
+    </dependency>	
+	<dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
+	<version>${json.simple.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -121,6 +134,11 @@
     	<artifactId>rest-assured</artifactId>
     	<version>3.0.2</version>
 	</dependency>
+	<dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <version>3.1.0</version>
+    </dependency>
   </dependencies>
   
   <build>
@@ -128,7 +146,13 @@
       <plugin><!-- Create a jar with all dependencies, run commandline using java -jar NAME -->
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <configuration>
+	<configuration>
+	  <source>17</source>
+                <target>17</target>
+                <!-- Add for Java 17 module compatibility -->
+                <compilerArgs>
+                    <arg>--enable-preview</arg>
+                </compilerArgs>
           <excludeDevtools>true</excludeDevtools>
         </configuration>
       </plugin>

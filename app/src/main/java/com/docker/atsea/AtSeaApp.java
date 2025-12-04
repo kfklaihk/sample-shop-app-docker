@@ -21,8 +21,8 @@ import com.docker.atsea.security.JwtFilter;
 public class AtSeaApp {
 
 	@Bean
-    public FilterRegistrationBean jwtFilter() {
-        final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+    public FilterRegistrationBean<JwtFilter> jwtFilter() {
+        final FilterRegistrationBean<JwtFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new JwtFilter());
         registrationBean.addUrlPatterns("/purchase/*");
 

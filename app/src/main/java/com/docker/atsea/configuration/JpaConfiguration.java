@@ -6,12 +6,12 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import javax.naming.NamingException;
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
+
+import jakarta.persistence.EntityManagerFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +25,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
@@ -58,7 +58,7 @@ public class JpaConfiguration {
 				sb.append(System.lineSeparator());
 				line = br.readLine();
 			}
-			dataSourceProperties.setDataPassword(sb.toString());
+			dataSourceProperties.setPassword(sb.toString());
 		} catch (IOException e) {
 			System.err.println("Could not successfully load DB password file");
 		}

@@ -2,13 +2,15 @@ package com.docker.atsea.model;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -47,7 +49,7 @@ public class Customer implements Serializable {
     private String password;
 	
 	@Column(name = "enabled", nullable = false)
-	@Type( type = "org.hibernate.type.NumericBooleanType")
+	@JdbcTypeCode(SqlTypes.BOOLEAN)	
 	private boolean enabled;
 	
 	@NotEmpty
