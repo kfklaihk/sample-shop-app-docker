@@ -16,11 +16,7 @@ import Modal from 'react-modal';
 import Logo from '../Logo';
 import './styles.css';
 import '../globalStyles.css';
-import {
-  getJwtToken,
-  removeJwtToken,
-  setJwtToken,
-} from '../../actions/storage';
+import { useAuth } from '../../context/AuthContext';
 import { SubmissionError } from 'redux-form'
 
 const customStyles = {
@@ -46,27 +42,22 @@ const customStyles = {
   },
 };
 
-class TopNav extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isCreateModalOpen: false,
-      isLoginModalOpen: false,
-      authenticated: (getJwtToken() !== null),
-      loginSuccessful: false,
-      createUserSuccessful: false,
-    };
-  }
+const TopNav = ({ ip, host, createCustomer, loginCustomer }) => {
+  const { user, logout, isAuthenticated } = useAuth();
+  const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
+  const [loginSuccessful, setLoginSuccessful] = React.useState(false);
+  const [createUserSuccessful, setCreateUserSuccessful] = React.useState(false);
 
-  handleLoginSuccess = ({ value: { token } }, username) => {
-    setJwtToken(token);
-    this.setState({ authenticated: true });
-    this.setState({ loginSuccessful: true });
+  const handleLoginSuccess = ({ value: { token } }, username) => {
+    // Token is now handled by AuthContext
+    setLoginSuccessful(true);
+    setIsLoginModalOpen(false);
   };
 
-  handleCreateUserSuccess(username, password) {
-    const { loginCustomer } = this.props;
-    this.setState({ createUserSuccessful: true });
+  const handleCreateUserSuccess = (username, password) => {
+    setCreateUserSuccessful(true);
+    setIsCreateModalOpen(false);
 
     // temporary sleep so that login will work
     var start = new Date().getTime();
@@ -78,78 +69,72 @@ class TopNav extends Component {
 
     return loginCustomer(username, password)
       .then((response) => {
-        this.handleLoginSuccess(response, username)
+        handleLoginSuccess(response, username)
       })
       .catch(err => {
         throw new SubmissionError({ _error: "Error logging in." })
       });
-  }
+  };
 
-  handleCreateUser = values => {
+  const handleCreateUser = values => {
     const {
       username,
       password,
     } = values;
-    const { createCustomer } = this.props;
     return createCustomer(username, password)
       .then((response) => {
-        this.handleCreateUserSuccess(username, password)
+        handleCreateUserSuccess(username, password)
       })
       .catch(err => {
         throw new SubmissionError({ username: "Username already exists" })
       });
   };
 
-  handleLogin = values => {
-    const {
-      username,
-      password,
-    } = values;
-    const { loginCustomer } = this.props;
-    return loginCustomer(username, password)
+  const handleLogin = (values) => {
+    return loginCustomer(values.username, values.password)
       .then((response) => {
-        this.handleLoginSuccess(response, username)
-        this.toggleLoginModal();
+        handleLoginSuccess(response, values.username)
       })
       .catch(err => {
-        throw new SubmissionError({ _error: "Error logging in." })
+        throw new SubmissionError({ _error: "Invalid username or password" })
       });
   };
 
-  renderContainerId() {
-    const {ip, host} = this.props;
+  const renderContainerId = () => {
     return (
       <div className="containerSection">
         {`IP: ${ip} HOST: ${host}`}
       </div>
     );
-  }
-
-  toggleCreateModal = () => {
-    this.setState({
-      isCreateModalOpen: !this.state.isCreateModalOpen,
-    });
   };
 
-  toggleLoginModal = () => {
-    this.setState({
-      isLoginModalOpen: !this.state.isLoginModalOpen,
-    });
+  const toggleCreateModal = () => {
+    setIsCreateModalOpen(!isCreateModalOpen);
+    if (!isCreateModalOpen) {
+      setCreateUserSuccessful(false);
+    }
   };
 
-  renderCreateModal = () => {
+  const toggleLoginModal = () => {
+    setIsLoginModalOpen(!isLoginModalOpen);
+    if (!isLoginModalOpen) {
+      setLoginSuccessful(false);
+    }
+  };
+
+  const renderCreateModal = () => {
     const successMessage = 'Congratulations! Your account has been created!';
-    const content = this.state.createUserSuccessful
+    const content = createUserSuccessful
       ? <SuccessMessage
         message={successMessage}
         label={'Continue Shopping'}
-        handleClick={this.toggleCreateModal}
+        handleClick={toggleCreateModal}
       />
-      : <CreateUserForm onSubmit={this.handleCreateUser} onSubmitFail={this.handleSubmitFail} />;
+      : <CreateUserForm onSubmit={handleCreateUser} onSubmitFail={handleSubmitFail} />;
     return (
       <Modal
-        isOpen={this.state.isCreateModalOpen}
-        onRequestClose={this.toggleCreateModal}
+        isOpen={isCreateModalOpen}
+        onRequestClose={toggleCreateModal}
         style={customStyles}
         contentLabel={''}
       >
@@ -160,11 +145,11 @@ class TopNav extends Component {
     );
   };
 
-  renderLoginModal = () => {
+  const renderLoginModal = () => {
     return (
       <Modal
-        isOpen={this.state.isLoginModalOpen}
-        onRequestClose={this.toggleLoginModal}
+        isOpen={isLoginModalOpen}
+        onRequestClose={toggleLoginModal}
         style={customStyles}
         contentLabel={''}
       >
@@ -175,7 +160,7 @@ class TopNav extends Component {
     );
   };
 
-  renderUnauthenticated() {
+  const renderUnauthenticated = () => {
     const styles = {
       color: '#fff',
     };
@@ -190,20 +175,20 @@ class TopNav extends Component {
         <FlatButton
           style={styles}
           labelStyle={labelStyles}
-          onClick={this.toggleCreateModal}
+          onClick={toggleCreateModal}
           label="Create User"
         />
         <FlatButton
           style={styles}
           labelStyle={labelStyles}
-          onClick={this.toggleLoginModal}
+          onClick={toggleLoginModal}
           label="Sign in"
         />
       </div>
     );
-  }
+  };
 
-  renderAuthenticated() {
+  const renderAuthenticated = () => {
     const styles = {
       color: '#fff'
     };
@@ -212,7 +197,7 @@ class TopNav extends Component {
       fontFamily: 'Open Sans',
       fontWeight: 600,
     };
-    const welcome = 'Welcome!'
+    const welcome = user ? `Welcome, ${user.username}!` : 'Welcome!'
     return (
       <div>
         <span className="welcomeMessage">
@@ -221,25 +206,18 @@ class TopNav extends Component {
         <FlatButton
           style={styles}
           labelStyle={labelStyles}
-          onClick={this.removeToken}
+          onClick={logout}
           label="Sign out"
         />
       </div>
     );
-  }
-
-  removeToken = () => {
-    removeJwtToken();
-    this.setState({
-      isCreateModalOpen: false,
-      isLoginModalOpen: false,
-      authenticated: false,
-      loginSuccessful: false,
-      createUserSuccessful: false,
-    });
   };
 
-  render() {
+  const handleSubmitFail = (errors) => {
+    console.error('Form submission failed:', errors);
+  };
+
+  const render = () => {
     return (
       <div className="globalContainer">
         <div className="navHeader">
@@ -247,19 +225,21 @@ class TopNav extends Component {
             <Logo />
           </div>
           <div className="navUser">
-            {this.renderContainerId()}
+            {renderContainerId()}
             <div className="buttonSection">
-              {this.state.authenticated
-                ? this.renderAuthenticated()
-                : this.renderUnauthenticated()}
+              {isAuthenticated
+                ? renderAuthenticated()
+                : renderUnauthenticated()}
             </div>
-            {this.renderCreateModal()}
-            {this.renderLoginModal()}
+            {renderCreateModal()}
+            {renderLoginModal()}
           </div>
         </div>
       </div>
     );
-  }
+  };
+
+  return render();
 }
 
 TopNav.propTypes = {

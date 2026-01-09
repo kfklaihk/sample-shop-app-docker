@@ -8,15 +8,22 @@ const UTILITY = '/utility'
 
 export const createOrder = (values) => (dispatch) => {
   const url = `${API}/order/`
+  const token = localStorage.getItem('accessToken');
+  let requestConfig = request
+    .post(url)
+    .set('Content-Type', 'application/json')
+    .accept('application/json');
+
+  // Add authorization header if token exists
+  if (token) {
+    requestConfig = requestConfig.set('Authorization', `Bearer ${token}`);
+  }
+
   let dispatchObj = {
     type: types.CREATE_ORDER,
     payload: {
       promise:
-      request
-        .post(url)
-        // TODO: will there ever be some sort of authentication here? for username and password.
-        .set('Content-Type', 'application/json')
-        .accept('application/json')
+      requestConfig
         .send(
         {
           /*
@@ -57,13 +64,21 @@ export const purchaseOrder = () => (dispatch) => {
 
 export const fetchAllItems = () => (dispatch) => {
   console.log('Fetching all products from API...');
+  const token = localStorage.getItem('accessToken');
+  let requestConfig = request
+    .get(`${API}/product/`)
+    .accept('application/json');
+
+  // Add authorization header if token exists
+  if (token) {
+    requestConfig = requestConfig.set('Authorization', `Bearer ${token}`);
+  }
+
   let dispatchObj = {
     type: types.ITEMS_REQUEST,
     payload: {
       promise:
-      request
-        .get(`${API}/product/`)
-        .accept('application/json')
+      requestConfig
         .end()
         .then((res) => {
           console.log('Successfully fetched products from API:', res.body);

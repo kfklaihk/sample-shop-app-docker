@@ -56,6 +56,12 @@ public class Customer implements Serializable {
 	@Column(name = "role", columnDefinition = "varchar(5) DEFAULT 'USER'")
 	private String role;
 	
+	@Column(name = "refresh_token", length = 500)
+	private String refreshToken;
+	
+	@Column(name = "stripe_customer_id", length = 255)
+	private String stripeCustomerId;
+	
 	public Customer() {
 		
 	}
@@ -143,6 +149,22 @@ public class Customer implements Serializable {
     
     public void setRole(String role) {
     	this.role = role;
+    }
+    
+    public String getRefreshToken() {
+    	return refreshToken;
+    }
+    
+    public void setRefreshToken(String refreshToken) {
+    	this.refreshToken = refreshToken;
+    }
+    
+    public String getStripeCustomerId() {
+    	return stripeCustomerId;
+    }
+    
+    public void setStripeCustomerId(String stripeCustomerId) {
+    	this.stripeCustomerId = stripeCustomerId;
     }
     
 	@Override

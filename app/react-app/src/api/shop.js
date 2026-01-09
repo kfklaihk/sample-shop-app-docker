@@ -1,11 +1,39 @@
 /**
- * Mocking client-server processing
+ * API client for AtSea shop backend
  */
-import _products from './products.json'
+import _products from './products.json';
 
-const TIMEOUT = 100
+const API_BASE = '/api';
+
+const getAuthHeaders = () => {
+  const accessToken = localStorage.getItem('accessToken');
+  return accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {};
+};
 
 export default {
-  getProducts: (cb, timeout) => setTimeout(() => cb(_products), timeout || TIMEOUT),
-  buyProducts: (payload, cb, timeout) => setTimeout(() => cb(), timeout || TIMEOUT)
+  getProducts: async (cb, timeout) => {
+    try {
+      const headers = getAuthHeaders();
+      const response = await fetch(`${API_BASE}/product/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...headers,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const products = await response.json();
+      cb(products);
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+      // Fallback to mock data if API fails
+      setTimeout(() => cb(_products), timeout || 100);
+    }
+  },
+
+  buyProducts: (payload, cb, timeout) => setTimeout(() => cb(), timeout || 100)
 }
