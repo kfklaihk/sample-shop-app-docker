@@ -1,189 +1,191 @@
-import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import React, { Component } from 'react';
+import { AuthConsumer } from '../context/AuthContext';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import Paper from 'material-ui/Paper';
 import { hashHistory } from 'react-router';
 
-const AuthPage = () => {
-  const { login, register } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    passwordConfirm: '',
-    name: '',
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+class AuthPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLogin: true,
+      formData: {
+        username: '',
+        email: '',
+        password: '',
+        passwordConfirm: '',
+        name: '',
+      },
+      error: '',
+      loading: false,
+    };
+  }
 
-  const handleInputChange = (field) => (event) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: event.target.value
-    }));
-    setError(''); // Clear error on input change
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      if (isLogin) {
-        await login(formData.username, formData.password);
-        hashHistory.push('/'); // Redirect to home after login
-      } else {
-        if (formData.password !== formData.passwordConfirm) {
-          setError('Passwords do not match');
-          setLoading(false);
-          return;
-        }
-        await register({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-          passwordConfirm: formData.passwordConfirm,
-          name: formData.name,
-        });
-        hashHistory.push('/'); // Redirect to home after registration
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const toggleMode = () => {
-    setIsLogin(!isLogin);
-    setError('');
-    setFormData({
-      username: '',
-      email: '',
-      password: '',
-      passwordConfirm: '',
-      name: '',
+  handleInputChange = (field) => (event) => {
+    this.setState({
+      formData: {
+        ...this.state.formData,
+        [field]: event.target.value
+      },
+      error: '' // Clear error on input change
     });
   };
 
-  const paperStyle = {
-    padding: 20,
-    margin: '20px auto',
-    maxWidth: 400,
+  handleSubmit = async (e) => {
+    e.preventDefault();
+    const { auth } = this.props;
+    this.setState({ loading: true, error: '' });
+
+    try {
+      if (this.state.isLogin) {
+        await auth.login(this.state.formData.username, this.state.formData.password);
+        hashHistory.push('/'); // Redirect to home after login
+      } else {
+        if (this.state.formData.password !== this.state.formData.passwordConfirm) {
+          this.setState({ error: 'Passwords do not match', loading: false });
+          return;
+        }
+        await auth.register({
+          username: this.state.formData.username,
+          email: this.state.formData.email,
+          password: this.state.formData.password,
+          passwordConfirm: this.state.formData.passwordConfirm,
+          name: this.state.formData.name,
+        });
+      }
+    } catch (error) {
+      this.setState({ error: error.message, loading: false });
+    }
   };
 
-  const formStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '16px',
+  toggleMode = () => {
+    this.setState({
+      isLogin: !this.state.isLogin,
+      error: '',
+      formData: {
+        username: '',
+        email: '',
+        password: '',
+        passwordConfirm: '',
+        name: '',
+      }
+    });
   };
 
-  const buttonStyle = {
-    marginTop: '16px',
-  };
+  render() {
+    const { isLogin, formData, error, loading } = this.state;
 
-  return (
-    <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
-      <Paper style={paperStyle}>
-        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>
-          {isLogin ? 'Login' : 'Register'}
-        </h2>
-
-        <form onSubmit={handleSubmit} style={formStyle}>
-          <TextField
-            hintText="Username"
-            floatingLabelText="Username"
-            value={formData.username}
-            onChange={handleInputChange('username')}
-            required
-            fullWidth
-          />
-
-          {!isLogin && (
-            <div>
-              <TextField
-                hintText="Email"
-                floatingLabelText="Email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange('email')}
-                required
-                fullWidth
-              />
-
-              <TextField
-                hintText="Full Name"
-                floatingLabelText="Full Name"
-                value={formData.name}
-                onChange={handleInputChange('name')}
-                required
-                fullWidth
-              />
-            </div>
-          )}
-
-          <TextField
-            hintText="Password"
-            floatingLabelText="Password"
-            type="password"
-            value={formData.password}
-            onChange={handleInputChange('password')}
-            required
-            fullWidth
-          />
-
-          {!isLogin && (
-            <TextField
-              hintText="Confirm Password"
-              floatingLabelText="Confirm Password"
-              type="password"
-              value={formData.passwordConfirm}
-              onChange={handleInputChange('passwordConfirm')}
-              required
-              fullWidth
-            />
-          )}
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#f5f5f5',
+        padding: '20px'
+      }}>
+        <Paper style={{
+          padding: '40px',
+          width: '100%',
+          maxWidth: '400px'
+        }}>
+          <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>
+            {isLogin ? 'Login' : 'Register'}
+          </h2>
 
           {error && (
-            <div style={{ color: 'red', fontSize: '14px', textAlign: 'center' }}>
+            <div style={{
+              color: '#d32f2f',
+              backgroundColor: '#ffebee',
+              padding: '10px',
+              borderRadius: '4px',
+              marginBottom: '20px'
+            }}>
               {error}
             </div>
           )}
 
-          <RaisedButton
-            label={loading ? 'Please wait...' : (isLogin ? 'Login' : 'Register')}
-            primary
-            type="submit"
-            disabled={loading}
-            fullWidth
-            style={buttonStyle}
-          />
+          <form onSubmit={this.handleSubmit}>
+            <TextField
+              floatingLabelText="Username"
+              fullWidth={true}
+              value={formData.username}
+              onChange={this.handleInputChange('username')}
+              required
+              style={{ marginBottom: '20px' }}
+            />
 
-          <div style={{ textAlign: 'center', marginTop: '16px' }}>
-            <span>
-              {isLogin ? "Don't have an account? " : "Already have an account? "}
-            </span>
-            <button
-              type="button"
-              onClick={toggleMode}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#1976d2',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-              }}
-            >
-              {isLogin ? 'Register' : 'Login'}
-            </button>
-          </div>
-        </form>
-      </Paper>
-    </div>
-  );
-};
+            {!isLogin && (
+              <>
+                <TextField
+                  floatingLabelText="Email"
+                  type="email"
+                  fullWidth={true}
+                  value={formData.email}
+                  onChange={this.handleInputChange('email')}
+                  required
+                  style={{ marginBottom: '20px' }}
+                />
 
-export default AuthPage;
+                <TextField
+                  floatingLabelText="Full Name"
+                  fullWidth={true}
+                  value={formData.name}
+                  onChange={this.handleInputChange('name')}
+                  required
+                  style={{ marginBottom: '20px' }}
+                />
+              </>
+            )}
+
+            <TextField
+              floatingLabelText="Password"
+              type="password"
+              fullWidth={true}
+              value={formData.password}
+              onChange={this.handleInputChange('password')}
+              required
+              style={{ marginBottom: '20px' }}
+            />
+
+            {!isLogin && (
+              <TextField
+                floatingLabelText="Confirm Password"
+                type="password"
+                fullWidth={true}
+                value={formData.passwordConfirm}
+                onChange={this.handleInputChange('passwordConfirm')}
+                required
+                style={{ marginBottom: '20px' }}
+              />
+            )}
+
+            <RaisedButton
+              type="submit"
+              label={loading ? 'Please wait...' : (isLogin ? 'Login' : 'Register')}
+              primary={true}
+              fullWidth={true}
+              disabled={loading}
+              style={{ marginBottom: '20px' }}
+            />
+
+            <div style={{ textAlign: 'center' }}>
+              <RaisedButton
+                label={isLogin ? 'Need an account? Register' : 'Already have an account? Login'}
+                onClick={this.toggleMode}
+                style={{ marginTop: '10px' }}
+              />
+            </div>
+          </form>
+        </Paper>
+      </div>
+    );
+  }
+}
+
+export default (props) => (
+  <AuthConsumer>
+    {(auth) => <AuthPage {...props} auth={auth} />}
+  </AuthConsumer>
+);

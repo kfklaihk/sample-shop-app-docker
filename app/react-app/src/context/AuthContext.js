@@ -1,32 +1,29 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { Component, createContext } from 'react';
 
 const AuthContext = createContext();
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const AuthConsumer = AuthContext.Consumer;
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+export class AuthProvider extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: null,
+      loading: true,
+    };
 
-  useEffect(() => {
     // Check for stored tokens on app start
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
     const username = localStorage.getItem('username');
 
     if (accessToken && refreshToken && username) {
-      setUser({ username, accessToken, refreshToken });
+      this.state.user = { username, accessToken, refreshToken };
     }
-    setLoading(false);
-  }, []);
+    this.state.loading = false;
+  }
 
-  const login = async (username, password) => {
+  login = async (username, password) => {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -52,14 +49,14 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('username', data.username);
 
-      setUser(userData);
+      this.setState({ user: userData });
       return userData;
     } catch (error) {
       throw error;
     }
   };
 
-  const register = async (userData) => {
+  register = async (userData) => {
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -75,7 +72,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      const authData = {
+      const user = {
         username: data.username,
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,
@@ -85,35 +82,21 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('username', data.username);
 
-      setUser(authData);
-      return authData;
+      this.setState({ user });
+      return user;
     } catch (error) {
       throw error;
     }
   };
 
-  const logout = async () => {
-    try {
-      const accessToken = localStorage.getItem('accessToken');
-      if (accessToken) {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        });
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-    } finally {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('username');
-      setUser(null);
-    }
+  logout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('username');
+    this.setState({ user: null });
   };
 
-  const refreshToken = async () => {
+  refreshToken = async () => {
     try {
       const refreshToken = localStorage.getItem('refreshToken');
       if (!refreshToken) {
@@ -133,46 +116,61 @@ export const AuthProvider = ({ children }) => {
       }
 
       const data = await response.json();
-      const userData = {
-        username: (user && user.username) || localStorage.getItem('username'),
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
+
+      const updatedUser = {
+        ...this.state.user,
         accessToken: data.accessToken,
-        refreshToken: data.refreshToken || refreshToken,
+        refreshToken: data.refreshToken,
       };
 
-      localStorage.setItem('accessToken', data.accessToken);
-      if (data.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken);
-        userData.refreshToken = data.refreshToken;
-      }
-
-      setUser(userData);
-      return userData;
+      this.setState({ user: updatedUser });
+      return updatedUser;
     } catch (error) {
       // If refresh fails, logout user
-      logout();
+      this.logout();
       throw error;
     }
   };
 
-  const getAuthHeaders = () => {
+  getAuthHeaders = () => {
     const accessToken = localStorage.getItem('accessToken');
     return accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {};
   };
 
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    logout,
-    refreshToken,
-    getAuthHeaders,
-    isAuthenticated: !!user,
-  };
+  render() {
+    const { children } = this.props;
+    const { user, loading } = this.state;
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+    const value = {
+      user,
+      loading,
+      login: this.login,
+      register: this.register,
+      logout: this.logout,
+      refreshToken: this.refreshToken,
+      getAuthHeaders: this.getAuthHeaders,
+      isAuthenticated: !!user,
+    };
+
+    return (
+      <AuthContext.Provider value={value}>
+        {children}
+      </AuthContext.Provider>
+    );
+  }
+}
+
+// Helper component to use auth context in class components
+export const withAuth = (WrappedComponent) => {
+  return class extends Component {
+    render() {
+      return (
+        <AuthConsumer>
+          {(auth) => <WrappedComponent {...this.props} auth={auth} />}
+        </AuthConsumer>
+      );
+    }
+  };
 };
