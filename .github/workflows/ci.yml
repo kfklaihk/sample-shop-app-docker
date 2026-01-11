@@ -22,15 +22,11 @@ jobs:
       - name: Install Yarn
         run: npm install -g yarn
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-
       - name: Cache yarn dependencies
         uses: actions/cache@v4
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('app/react-app/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
 
@@ -40,7 +36,7 @@ jobs:
 
       - name: Run frontend tests
         working-directory: ./app/react-app
-        run: yarn test --ci --watchAll=false --passWithNoTests
+        run: yarn test --ci --watchAll=false
 
       - name: Build frontend
         working-directory: ./app/react-app
