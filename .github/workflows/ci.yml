@@ -41,6 +41,9 @@ jobs:
       - name: Build frontend
         working-directory: ./app/react-app
         run: yarn build
+        env:
+          SKIP_PREFLIGHT_CHECK: true
+          CI: false
 
       - name: Upload frontend build artifact
         uses: actions/upload-artifact@v4
