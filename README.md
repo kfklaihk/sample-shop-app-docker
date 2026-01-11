@@ -1,6 +1,8 @@
 ![](atsea_store.png)
 #  AtSea Shop Demonstration Application
 
+<!-- CI Test: Testing GitHub Actions workflow with yarn cache fix -->
+
 The AtSea Shop is a demonstration application comprised of: 
 
 * Java REST application written using Spring-Boot, 
