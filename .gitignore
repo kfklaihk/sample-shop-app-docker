@@ -20,6 +20,8 @@ site.conf
 *.bak
 linux.md
 src/
+!app/src/
+!app/react-app/src/
 
 ###################
 *.com
