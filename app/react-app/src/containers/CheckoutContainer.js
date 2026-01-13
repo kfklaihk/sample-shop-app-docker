@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { hashHistory } from 'react-router'
 import moment from 'moment'
-import { useAuth } from '../context/AuthContext'
 import {
   checkout,
   createOrder,

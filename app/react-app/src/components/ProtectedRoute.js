@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, hashHistory } from 'react-router';
+import { hashHistory } from 'react-router';
 
 const ProtectedRoute = ({ component: Component, ...rest }) => {
   // For React Router v2, we need to handle authentication differently

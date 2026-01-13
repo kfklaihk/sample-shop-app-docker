@@ -36,14 +36,13 @@ jobs:
 
       - name: Run frontend tests
         working-directory: ./app/react-app
-        run: yarn test --ci --watchAll=false
+        run: CI=true yarn test
 
       - name: Build frontend
         working-directory: ./app/react-app
         run: yarn build
         env:
           SKIP_PREFLIGHT_CHECK: true
-          CI: false
 
       - name: Upload frontend build artifact
         uses: actions/upload-artifact@v4
