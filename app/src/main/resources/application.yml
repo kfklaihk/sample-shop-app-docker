@@ -38,6 +38,10 @@ spring:
           max-interval: 10000
           multiplier: 2.0
 
+  web:
+    resources:
+      static-locations: file:/static/
+
 # Stripe Configuration
 stripe:
   api-key: "${STRIPE_API_KEY:sk_test_placeholder}"

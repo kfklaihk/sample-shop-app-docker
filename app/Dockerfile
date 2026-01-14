@@ -12,6 +12,7 @@ COPY . .
 RUN mvn -X -e -B -s /usr/share/maven/ref/settings-docker.xml package -DskipTests
 
 FROM openjdk:17-jdk-alpine 
+RUN apk update && apk add --no-cache curl
 RUN  adduser -Dh /home/gordon gordon 
 WORKDIR /static
 COPY --from=storefront /usr/src/atsea/app/react-app/build/ .
