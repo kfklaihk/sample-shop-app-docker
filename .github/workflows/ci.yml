@@ -74,6 +74,7 @@ jobs:
             ${{ runner.os }}-m2-
 
       - name: Build with Maven
+        working-directory: ./app
         run: mvn -B -e -T 1C verify
         env:
           MAVEN_OPTS: -Xmx2g
