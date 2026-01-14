@@ -9,7 +9,7 @@ import java.io.Serializable;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="product", uniqueConstraints = { @UniqueConstraint(columnNames = "productid")})
+@Table(name = "product")
 @JsonInclude(Include.NON_NULL)
 public class Product implements Serializable {
 
@@ -17,6 +17,7 @@ public class Product implements Serializable {
 	 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "productid")
     private long productId;
     
     @NotEmpty
