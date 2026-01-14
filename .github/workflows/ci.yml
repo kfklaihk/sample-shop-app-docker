@@ -75,7 +75,7 @@ jobs:
 
       - name: Build with Maven
         working-directory: ./app
-        run: mvn -B -e -T 1C verify
+        run: mvn -B -e -T 1C verify -Dspring.profiles.active=test
         env:
           MAVEN_OPTS: -Xmx2g
 

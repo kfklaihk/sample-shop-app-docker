@@ -15,7 +15,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.docker.atsea.dto.LoginRequest;
@@ -37,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 @DisplayName("Auth Controller Integration Tests")
 public class AuthControllerIntegrationTest {
     
@@ -54,6 +59,9 @@ public class AuthControllerIntegrationTest {
     
     @MockBean
     private RefreshTokenRepository refreshTokenRepository;
+
+    @MockBean
+    private AuthenticationManager authenticationManager;
     
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -88,6 +96,22 @@ public class AuthControllerIntegrationTest {
         
         // Create test login request
         validLoginRequest = new LoginRequest("testuser", "password123");
+
+        // Configure authentication behavior:
+        // - Success only for (testuser, password123)
+        // - Fail for anything else (so invalid credential tests still pass)
+        when(authenticationManager.authenticate(any()))
+                .thenAnswer(invocation -> {
+                    Object arg = invocation.getArgument(0);
+                    if (arg instanceof UsernamePasswordAuthenticationToken token) {
+                        Object principal = token.getPrincipal();
+                        Object credentials = token.getCredentials();
+                        if ("testuser".equals(principal) && "password123".equals(credentials)) {
+                            return token;
+                        }
+                    }
+                    throw new BadCredentialsException("Invalid username or password");
+                });
     }
     
     @Test
