@@ -7,20 +7,20 @@ export const AuthConsumer = AuthContext.Consumer;
 export class AuthProvider extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      user: null,
-      loading: true,
-    };
-
     // Check for stored tokens on app start
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
     const username = localStorage.getItem('username');
 
-    if (accessToken && refreshToken && username) {
-      this.state.user = { username, accessToken, refreshToken };
-    }
-    this.state.loading = false;
+    const user =
+      accessToken && refreshToken && username
+        ? { username, accessToken, refreshToken }
+        : null;
+
+    this.state = {
+      user,
+      loading: false,
+    };
   }
 
   login = async (username, password) => {

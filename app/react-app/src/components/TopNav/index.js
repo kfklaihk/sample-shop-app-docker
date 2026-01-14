@@ -58,7 +58,7 @@ class TopNav extends Component {
             {isAuthenticated ? (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span style={{ marginRight: '10px' }}>
-                  Welcome, {user?.username || 'User'}
+                  Welcome, {(user && user.username) || 'User'}
                 </span>
                 <FlatButton
                   label="Logout"

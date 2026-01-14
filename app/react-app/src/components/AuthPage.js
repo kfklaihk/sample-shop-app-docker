@@ -117,7 +117,7 @@ class AuthPage extends Component {
             />
 
             {!isLogin && (
-              <>
+              <div>
                 <TextField
                   floatingLabelText="Email"
                   type="email"
@@ -136,7 +136,7 @@ class AuthPage extends Component {
                   required
                   style={{ marginBottom: '20px' }}
                 />
-              </>
+              </div>
             )}
 
             <TextField

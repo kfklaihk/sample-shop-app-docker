@@ -1,5 +1,6 @@
 package com.docker.atsea.configuration;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -21,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Uses in-memory sliding window counter. For production, use Redis.
  */
 @Configuration
+@Profile("!test")
 public class RateLimitingConfig implements WebMvcConfigurer {
     
     @Override
