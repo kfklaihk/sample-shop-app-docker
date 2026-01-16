@@ -104,7 +104,8 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/utility/**").permitAll()
                 
-                // Protected product endpoints (requires USER role)
+                // Public product endpoints (no auth required for browsing)
+                .requestMatchers("/api/product/**").permitAll()
                 .requestMatchers("/api/products/**").hasRole("USER")
                 
                 // Protected order endpoints (requires USER role)

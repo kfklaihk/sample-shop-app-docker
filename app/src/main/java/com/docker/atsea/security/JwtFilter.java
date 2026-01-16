@@ -25,7 +25,6 @@ import javax.crypto.SecretKey;
  * New implementations should use JwtAuthenticationFilter which integrates
  * with Spring Security's SecurityContext.
  */
-@Component
 @Deprecated
 public class JwtFilter extends GenericFilterBean {
     

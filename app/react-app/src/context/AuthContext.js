@@ -1,26 +1,66 @@
-import React, { Component, createContext } from 'react';
+import React, { Component } from 'react';
 
-const AuthContext = createContext();
+// Manual implementation of Context API for React 15 which doesn't have React.createContext
+const listeners = new Set();
+let currentContextValue = {
+  user: null,
+  loading: true,
+  isAuthenticated: false,
+};
 
-export const AuthConsumer = AuthContext.Consumer;
+const updateContext = (newValue) => {
+  currentContextValue = { ...currentContextValue, ...newValue };
+  listeners.forEach(listener => listener(currentContextValue));
+};
+
+export class AuthConsumer extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { value: currentContextValue };
+  }
+  componentDidMount() {
+    listeners.add(this.handleChange);
+    // Sync with global value in case it changed between constructor and mount
+    if (this.state.value !== currentContextValue) {
+      this.setState({ value: currentContextValue });
+    }
+  }
+  componentWillUnmount() {
+    listeners.delete(this.handleChange);
+  }
+  handleChange = (value) => {
+    this.setState({ value });
+  };
+  render() {
+    return this.props.children(this.state.value);
+  }
+}
 
 export class AuthProvider extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      user: null,
-      loading: true,
-    };
 
-    // Check for stored tokens on app start
+    // Initial check for tokens to avoid "loading" flash if possible
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
     const username = localStorage.getItem('username');
 
+    let initialUser = null;
     if (accessToken && refreshToken && username) {
-      this.state.user = { username, accessToken, refreshToken };
+      initialUser = { username, accessToken, refreshToken };
     }
-    this.state.loading = false;
+
+    // Initialize the global context value
+    updateContext({
+      user: initialUser,
+      loading: false,
+      isAuthenticated: !!initialUser,
+      login: this.login,
+      register: this.register,
+      logout: this.logout,
+      refreshToken: this.refreshToken,
+      getAuthHeaders: this.getAuthHeaders,
+    });
   }
 
   login = async (username, password) => {
@@ -39,7 +79,7 @@ export class AuthProvider extends Component {
       }
 
       const data = await response.json();
-      const userData = {
+      const user = {
         username: data.username,
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,
@@ -49,8 +89,8 @@ export class AuthProvider extends Component {
       localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('username', data.username);
 
-      this.setState({ user: userData });
-      return userData;
+      updateContext({ user, isAuthenticated: true });
+      return user;
     } catch (error) {
       throw error;
     }
@@ -82,7 +122,7 @@ export class AuthProvider extends Component {
       localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('username', data.username);
 
-      this.setState({ user });
+      updateContext({ user, isAuthenticated: true });
       return user;
     } catch (error) {
       throw error;
@@ -93,7 +133,7 @@ export class AuthProvider extends Component {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('username');
-    this.setState({ user: null });
+    updateContext({ user: null, isAuthenticated: false });
   };
 
   refreshToken = async () => {
@@ -120,15 +160,14 @@ export class AuthProvider extends Component {
       localStorage.setItem('refreshToken', data.refreshToken);
 
       const updatedUser = {
-        ...this.state.user,
+        ...currentContextValue.user,
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,
       };
 
-      this.setState({ user: updatedUser });
+      updateContext({ user: updatedUser });
       return updatedUser;
     } catch (error) {
-      // If refresh fails, logout user
       this.logout();
       throw error;
     }
@@ -140,25 +179,8 @@ export class AuthProvider extends Component {
   };
 
   render() {
-    const { children } = this.props;
-    const { user, loading } = this.state;
-
-    const value = {
-      user,
-      loading,
-      login: this.login,
-      register: this.register,
-      logout: this.logout,
-      refreshToken: this.refreshToken,
-      getAuthHeaders: this.getAuthHeaders,
-      isAuthenticated: !!user,
-    };
-
-    return (
-      <AuthContext.Provider value={value}>
-        {children}
-      </AuthContext.Provider>
-    );
+    // In React 15, we just return the children
+    return this.props.children;
   }
 }
 

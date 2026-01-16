@@ -6,6 +6,7 @@ import { Router, Route, hashHistory } from 'react-router'
 import { createLogger } from 'redux-logger'
 import thunkMiddleware from 'redux-thunk'
 import promiseMiddleware from 'redux-promise-middleware'
+import injectTapEventPlugin from 'react-tap-event-plugin'
 import reducer from './reducers'
 import {
   fetchAllDummyItems,
@@ -18,8 +19,10 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import CheckoutContainer from './containers/CheckoutContainer'
 import { AuthProvider } from './context/AuthContext'
 import AuthPage from './components/AuthPage'
-import ProtectedRoute from './components/ProtectedRoute'
 
+// Needed for onTouchTap
+// http://stackoverflow.com/a/34015469/988941
+injectTapEventPlugin()
 
 const middleware = [
   thunkMiddleware,
@@ -57,8 +60,8 @@ render(
       <MuiThemeProvider muiTheme={muiTheme}>
         <Router history={hashHistory}>
           <Route path="/auth" component={AuthPage} />
-          <ProtectedRoute path="/" component={App} />
-          <ProtectedRoute path="/checkout" component={CheckoutContainer} />
+          <Route path="/" component={App} />
+          <Route path="/checkout" component={CheckoutContainer} />
         </Router>
       </MuiThemeProvider>
     </AuthProvider>

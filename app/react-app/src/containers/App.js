@@ -9,6 +9,13 @@ import TitleContainer from './TitleContainer'
 import ProductsContainer from './ProductsContainer'
 
 class App extends Component {
+  componentDidMount() {
+    const { auth } = this.props;
+    if (!auth.loading && !auth.isAuthenticated) {
+      hashHistory.push('/auth');
+    }
+  }
+
   componentDidUpdate() {
     const { auth } = this.props;
     if (!auth.loading && !auth.isAuthenticated) {
