@@ -30,8 +30,8 @@ export default {
       cb(products);
     } catch (error) {
       console.error('Failed to fetch products:', error);
-      // Fallback to mock data if API fails
-      setTimeout(() => cb(_products), timeout || 100);
+      // Removed fallback to mock data to ensure API is used
+      cb([]);
     }
   },
 

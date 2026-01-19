@@ -13,7 +13,6 @@ import com.docker.atsea.configuration.JpaConfiguration;
 @Import(JpaConfiguration.class)
 @SpringBootApplication(scanBasePackages={"com.docker.atsea"})
 @EntityScan("com.docker.atsea.model")
-@EnableJpaRepositories("com.docker.atsea.repository")
 public class AtSeaApp {
 	
 	public static void main(String[] args) {

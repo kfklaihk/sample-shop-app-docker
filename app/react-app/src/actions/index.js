@@ -84,10 +84,6 @@ export const fetchAllItems = () => (dispatch) => {
           console.log('Successfully fetched products from API:', res.body);
           return res.body;
         })
-        .catch(err => {
-          console.error("Error fetching products from API:", err);
-          return [];
-        })
     },
   }
   return dispatch(dispatchObj)
