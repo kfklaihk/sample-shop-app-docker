@@ -66,29 +66,43 @@ public class AuthService {
      * @throws IllegalArgumentException if validation fails
      */
     public AuthResponse register(RegisterRequest request) {
+        String username = request.getUsername() != null ? request.getUsername().trim() : null;
+        String email = request.getEmail() != null ? request.getEmail().trim() : null;
+        String name = request.getName() != null ? request.getName().trim() : null;
+        String address = request.getAddress() != null ? request.getAddress().trim() : null;
+        String phone = request.getPhone() != null ? request.getPhone().trim() : null;
+
+        if (username == null || username.isEmpty()) {
+            throw new IllegalArgumentException("Username is required");
+        }
+
+        if (email == null || email.isEmpty()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+
         // Validate password confirmation
         if (!request.getPassword().equals(request.getPasswordConfirm())) {
             throw new IllegalArgumentException("Passwords do not match");
         }
         
         // Check for duplicate username (case-insensitive)
-        if (customerRepository.existsByUsernameIgnoreCase(request.getUsername())) {
+        if (customerRepository.existsByUsernameIgnoreCase(username)) {
             throw new IllegalArgumentException("Username already exists");
         }
         
         // Check for duplicate email (case-insensitive)
-        if (customerRepository.existsByEmailIgnoreCase(request.getEmail())) {
+        if (customerRepository.existsByEmailIgnoreCase(email)) {
             throw new IllegalArgumentException("Email already exists");
         }
         
         // Create new customer with hashed password
         Customer customer = new Customer();
-        customer.setName(request.getName());
-        customer.setUsername(request.getUsername());
-        customer.setEmail(request.getEmail());
+        customer.setName(name);
+        customer.setUsername(username);
+        customer.setEmail(email);
         customer.setPassword(passwordEncoder.encode(request.getPassword())); // Hash password
-        customer.setAddress(request.getAddress());
-        customer.setPhone(request.getPhone());
+        customer.setAddress(address != null && !address.isEmpty() ? address : "Not Provided");
+        customer.setPhone(phone != null && !phone.isEmpty() ? phone : "0000000000");
         customer.setEnabled(true);
         customer.setRole("USER");
         

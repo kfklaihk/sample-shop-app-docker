@@ -48,9 +48,9 @@ public class SecurityConfiguration {
     @Autowired
     public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
         auth.jdbcAuthentication()
-        		.dataSource(dataSource)
-                .usersByUsernameQuery("SELECT username, password, enabled FROM customer WHERE username = ?")
-                .authoritiesByUsernameQuery("SELECT username, role FROM customer WHERE username=?")
+        	.dataSource(dataSource)
+            .usersByUsernameQuery("SELECT username, password, enabled FROM customer WHERE lower(username) = lower(?)")
+            .authoritiesByUsernameQuery("SELECT username, role FROM customer WHERE lower(username) = lower(?)")
                 .passwordEncoder(passwordEncoder);
     }
     
@@ -109,6 +109,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/products/**").hasRole("USER")
                 
                 // Protected order endpoints (requires USER role)
+                .requestMatchers("/api/order/**").hasRole("USER")
                 .requestMatchers("/api/orders/**").hasRole("USER")
                 .requestMatchers("/api/checkout/**").hasRole("USER")
                 

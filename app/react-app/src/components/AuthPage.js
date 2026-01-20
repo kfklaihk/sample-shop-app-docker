@@ -16,8 +16,6 @@ class AuthPage extends Component {
         password: '',
         passwordConfirm: '',
         name: '',
-        address: '',
-        phone: '',
       },
       error: '',
       loading: false,
@@ -54,10 +52,7 @@ class AuthPage extends Component {
           password: this.state.formData.password,
           passwordConfirm: this.state.formData.passwordConfirm,
           name: this.state.formData.name,
-          address: this.state.formData.address,
-          phone: this.state.formData.phone,
         });
-        hashHistory.push('/'); // Redirect to home after registration
       }
     } catch (error) {
       this.setState({ error: error.message, loading: false });
@@ -74,8 +69,6 @@ class AuthPage extends Component {
         password: '',
         passwordConfirm: '',
         name: '',
-        address: '',
-        phone: '',
       }
     });
   };
@@ -140,24 +133,6 @@ class AuthPage extends Component {
                   fullWidth={true}
                   value={formData.name}
                   onChange={this.handleInputChange('name')}
-                  required
-                  style={{ marginBottom: '20px' }}
-                />
-
-                <TextField
-                  floatingLabelText="Address"
-                  fullWidth={true}
-                  value={formData.address}
-                  onChange={this.handleInputChange('address')}
-                  required
-                  style={{ marginBottom: '20px' }}
-                />
-
-                <TextField
-                  floatingLabelText="Phone"
-                  fullWidth={true}
-                  value={formData.phone}
-                  onChange={this.handleInputChange('phone')}
                   required
                   style={{ marginBottom: '20px' }}
                 />

@@ -39,7 +39,13 @@ export const createOrder = (values) => (dispatch) => {
         }
         )
         .end()
-        .then((res) => res.body)
+        .then((res) => {
+          // Clear cart in Redis after order is placed
+          shop.clearCart(() => {
+            dispatch(fetchCart());
+          });
+          return res.body;
+        })
     },
   }
   return dispatch(dispatchObj)
@@ -214,10 +220,17 @@ export const resetItemAdded = () => (dispatch) => {
   })
 }
 
-const addToCartUnsafe = productId => ({
-  type: types.ADD_TO_CART,
-  productId
-})
+export const fetchCart = () => (dispatch) => {
+  let dispatchObj = {
+    type: types.FETCH_CART,
+    payload: {
+      promise: new Promise((resolve, reject) => {
+        shop.getCart((cart) => resolve(cart));
+      })
+    },
+  }
+  return dispatch(dispatchObj)
+}
 
 export const showAddToCart = () => (dispatch) => {
   dispatch({
@@ -227,55 +240,44 @@ export const showAddToCart = () => (dispatch) => {
 
 export const addToCart = productId => (dispatch, getState) => {
   console.log('addToCart action called with productId:', productId)
+  
+  // Dispatch local action immediately for optimistic UI update
+  dispatch({
+    type: types.ADD_TO_CART,
+    productId
+  });
+
   try {
-    // Update local store state
-    dispatch(addToCartUnsafe(productId))
-    console.log('addToCartUnsafe dispatched successfully')
-    dispatch(showAddToCart())
-    console.log('showAddToCart dispatched successfully')
+    const { products } = getState();
+    const product = products.byId[productId];
     
-    // Get current cart state
-    const { cart } = getState()
-    console.log('Current cart state:', cart)
-    
-    // Create an order object for the API
-    const orderData = {
-      orderId: 0, // The backend will assign a real ID
-      orderDate: new Date().toISOString(),
-      customerId: 0, // If user is not logged in, use 0 or get from state if logged in
-      productsOrdered: {}
+    if (product) {
+      shop.addToCart(product, 1, () => {
+        dispatch(fetchCart());
+        dispatch(showAddToCart());
+        setTimeout(() => {
+          dispatch(resetItemAdded())
+        }, 2500)
+      });
     }
-    
-    // Add products from cart to the order
-    Object.keys(cart.quantityById).forEach(productId => {
-      orderData.productsOrdered[productId] = cart.quantityById[productId]
-    })
-    
-    console.log('Sending order data to API:', orderData)
-    
-    // Send request to backend API - use the correct endpoint
-    const url = `${API}/order/`
-    console.log('Sending API request to:', url)
-    request
-      .post(url)
-      .set('Content-Type', 'application/json')
-      .accept('application/json')
-      .send(orderData)
-      .end()
-      .then(res => {
-        console.log('Successfully created order on server:', res.body)
-      })
-      .catch(err => {
-        console.error('Error creating order on server:', err)
-      })
-    
-    setTimeout(() => {
-      dispatch(resetItemAdded())
-      console.log('resetItemAdded dispatched after timeout')
-    }, 2500)
   } catch (error) {
     console.error('Error in addToCart action:', error)
   }
+}
+
+export const removeFromCart = productId => (dispatch) => {
+  shop.removeFromCart(productId, () => {
+    dispatch(fetchCart());
+  });
+}
+
+export const clearCartContents = () => (dispatch) => {
+  return shop.clearCart(() => {
+    dispatch(fetchCart());
+  }).catch((error) => {
+    // Re-throw so callers can surface the error state
+    throw error;
+  });
 }
 
 export const checkout = products => (dispatch, getState) => {

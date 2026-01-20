@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { hashHistory } from 'react-router'
 import moment from 'moment'
+import { useAuth } from '../context/AuthContext'
 import {
   checkout,
   createOrder,
@@ -63,12 +64,13 @@ class CheckoutContainer extends Component {
       throw new SubmissionError({ _error: "Please add to cart first..." })
     }
 
-    // TODO: Create Order
-    return purchaseOrder()
+    // Create Order and post to RabbitMQ
+    return this.props.createOrder(submitData)
+      .then(() => purchaseOrder())
       .then(this.handleSuccess)
-      // error: status 404
       .catch((err) => {
-        throw new SubmissionError({ _error: "Please login before completing order..." })
+        console.error("Checkout error:", err);
+        throw new SubmissionError({ _error: "Checkout failed. Please ensure you are logged in." })
       })
   }
 

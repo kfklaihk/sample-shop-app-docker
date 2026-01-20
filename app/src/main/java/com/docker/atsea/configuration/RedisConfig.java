@@ -1,5 +1,6 @@
 package com.docker.atsea.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -31,8 +32,10 @@ public class RedisConfig {
      * @return RedisConnectionFactory configured for Lettuce
      */
     @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory();
+    public RedisConnectionFactory redisConnectionFactory(
+            @Value("${spring.redis.host:localhost}") String host,
+            @Value("${spring.redis.port:6379}") int port) {
+        return new LettuceConnectionFactory(host, port);
     }
 
     /**

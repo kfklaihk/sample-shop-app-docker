@@ -30,12 +30,10 @@ public class RegisterRequest {
     @NotBlank(message = "Password confirmation is required")
     private String passwordConfirm;
     
-    @NotBlank(message = "Address is required")
     @Size(min = 5, max = 512, message = "Address must be between 5 and 512 characters")
     private String address;
     
-    @NotBlank(message = "Phone is required")
-    @Size(min = 10, max = 32, message = "Phone must be between 10 and 32 characters")
+    @Size(min = 7, max = 32, message = "Phone must be between 7 and 32 characters")
     private String phone;
     
     // Getters and Setters

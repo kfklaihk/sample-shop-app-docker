@@ -47,8 +47,8 @@ services:
       - back-tier
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-      interval: 10s
-      timeout: 5s
+      interval: 20s
+      timeout: 10s
       retries: 5
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
@@ -85,13 +85,15 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8080/utility/healthcheck/"]
       interval: 15s
       timeout: 10s
-      retries: 5
+      retries: 10
 
   payment_gateway:
     build:
       context: payment_gateway
     networks:
-      - payment
+      - back-tier
+    environment:
+      PYTHONUNBUFFERED: 1
     secrets:
       - payment_token
 
