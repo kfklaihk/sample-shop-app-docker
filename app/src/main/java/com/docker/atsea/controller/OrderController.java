@@ -41,7 +41,7 @@ public class OrderController {
 
 	// -------------------Create an Order-------------------------------------------
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/order/", method = RequestMethod.POST)
+	@RequestMapping(value = {"/order/", "/order"}, method = RequestMethod.POST)
 	public ResponseEntity<?> createOrder(@RequestBody Order order, UriComponentsBuilder ucBuilder, Principal principal) {
 		logger.info("Creating order : {}", order);
 
@@ -91,7 +91,7 @@ public class OrderController {
 	
 	// ------------------- Get All Orders-----------------------------
 	
-	@RequestMapping(value = "/order/", method = RequestMethod.GET)
+	@RequestMapping(value = {"/order/", "/order"}, method = RequestMethod.GET)
 	public ResponseEntity<List<Order>> listAllOrderss() {
 		List<Order> order = orderService.findAllOrders();
 		if (order.isEmpty()) {

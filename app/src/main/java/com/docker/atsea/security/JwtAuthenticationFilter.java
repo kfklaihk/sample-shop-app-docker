@@ -61,9 +61,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 List<String> roles = jwtTokenProvider.getRolesFromToken(token);
                 
                 // Convert roles to Spring Security authorities
-                List<SimpleGrantedAuthority> authorities = roles.stream()
+                List<SimpleGrantedAuthority> authorities = (roles != null) ? roles.stream()
                         .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                        .toList();
+                        .toList() : List.of();
                 
                 // Create authentication token
                 UsernamePasswordAuthenticationToken authToken = 

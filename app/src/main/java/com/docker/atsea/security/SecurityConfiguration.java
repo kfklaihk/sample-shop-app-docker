@@ -71,13 +71,13 @@ public class SecurityConfiguration {
     /**
      * HTTP security filter chain configuration.
      * 
-     * - CSRF: Enabled for form submissions
+     * - CSRF: Disabled for API-only application
      * - Session: Stateless (no session storage; pure token-based)
      * - JWT Filter: Added before UsernamePasswordAuthenticationFilter
      * - Authorization:
      *   - /api/auth/**: permitAll (public endpoints)
      *   - /api/products/**: require ROLE_USER
-     *   - /api/orders/**: require ROLE_USER
+     *   - /api/order/**: require ROLE_USER
      *   - /api/admin/**: require ROLE_ADMIN
      *   - All others: permitAll
      * 
@@ -89,8 +89,8 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		
 		http
-        // Disable CORS for API-only application (can be re-enabled for frontend)
-        .cors(cors -> cors.disable())
+        // Enable CORS with default configuration
+        .cors(cors -> {})
         
         // Enable CSRF protection (important for token-based auth)
         .csrf(csrf -> csrf.disable())
@@ -105,16 +105,16 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/utility/**").permitAll()
                 
                 // Public product endpoints (no auth required for browsing)
-                .requestMatchers("/api/product/**").permitAll()
-                .requestMatchers("/api/products/**").hasRole("USER")
+                .requestMatchers("/api/product/**", "/api/product/").permitAll()
+                .requestMatchers("/api/products/**", "/api/products/").hasRole("USER")
                 
                 // Protected order endpoints (requires USER role)
-                .requestMatchers("/api/order/**").hasRole("USER")
-                .requestMatchers("/api/orders/**").hasRole("USER")
-                .requestMatchers("/api/checkout/**").hasRole("USER")
+                .requestMatchers("/api/order/**", "/api/order", "/api/order/").hasRole("USER")
+                .requestMatchers("/api/orders/**", "/api/orders", "/api/orders/").hasRole("USER")
+                .requestMatchers("/api/checkout/**", "/api/checkout").hasRole("USER")
                 
                 // Admin endpoints (requires ADMIN role)
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**", "/api/admin").hasRole("ADMIN")
                 
                 // All other requests permitted (backward compatibility)
                 .anyRequest().permitAll()

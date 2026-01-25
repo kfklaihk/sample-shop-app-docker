@@ -90,10 +90,17 @@ services:
   payment_gateway:
     build:
       context: payment_gateway
+    command: python listener.py
     networks:
       - back-tier
     environment:
       PYTHONUNBUFFERED: 1
+      MAILERSEND_API_KEY: "mlsn.ad8c53a9a5e94c59dce0d29ebebd04ca6848835ced95fcbbd3300f1bd3d4976f"
+      MAIL_FROM_EMAIL: "MS_Zz26ZQ@test-2p0347zo9x7lzdrn.mlsender.net"
+      MAIL_FROM_NAME: "AtSea Shop"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     secrets:
       - payment_token
 
