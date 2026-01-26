@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { hashHistory } from 'react-router'
-import moment from 'moment'
 import {
   checkout,
   createOrder,
@@ -34,30 +33,11 @@ class CheckoutContainer extends Component {
     this.setState({ orderComplete: true })
   }
 
-  
   handleSubmit = (values) => {
     const {
-        customerId,
       purchaseOrder,
       totalProducts,
-      quantityById
       } = this.props
-
-    // This data will be used for create order endpoint
-    const date = moment().format()
-    
-    const {
-        firstName,
-      lastName,
-      } = values
-    
-    const submitData = {
-      customerId,
-      name: firstName,
-      orderDate: date,
-      lastName,
-      quantityById
-    }
 
     if (totalProducts === 0) {
       throw new SubmissionError({ _error: "Please add to cart first..." })

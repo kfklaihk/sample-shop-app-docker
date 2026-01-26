@@ -1,20 +1,8 @@
-/* eslint-disable */
 import { combineReducers } from 'redux'
 import {
   ITEMS_REQUEST,
   DUMMY_ITEMS_REQUEST,
-  ADD_TO_CART,
 } from '../constants/ActionTypes'
-
-
-const products = (state, action) => {
-  switch (action.type) {
-    case ADD_TO_CART:
-      return state
-    default:
-      return state
-  }
-}
 
 const byId = (state = {}, action) => {
   switch (action.type) {
