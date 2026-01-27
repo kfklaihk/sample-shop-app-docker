@@ -55,8 +55,8 @@ services:
 
   appserver:
     build:
-       context: app
-       dockerfile: Dockerfile
+       context: .
+       dockerfile: app/Dockerfile
     image: atsea_app
     user: gordon
     ports:

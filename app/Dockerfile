@@ -1,17 +1,17 @@
 # Stage 1: Build the React frontend
 FROM node:18-alpine AS frontend-build
 WORKDIR /react-build
-COPY react-app/package.json react-app/package-lock.json* ./
+COPY app/react-app/package.json app/react-app/package-lock.json* ./
 RUN npm install
-COPY react-app/ ./
+COPY app/react-app/ ./
 RUN npm run build
 
 # Stage 2: Build the Java backend
 FROM maven:3.8.8-eclipse-temurin-17 AS backend-build
 WORKDIR /app
-COPY pom.xml .
+COPY app/pom.xml .
 RUN mvn dependency:go-offline -B
-COPY src ./src
+COPY app/src ./src
 RUN mvn package -DskipTests
 
 # Stage 3: Final runtime image
