@@ -13,6 +13,7 @@ import org.springframework.data.redis.repository.config.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+
 /**
  * Redis configuration for distributed caching and session management.
  * Enables Spring's caching abstraction with Redis backend.
