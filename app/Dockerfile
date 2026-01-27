@@ -7,7 +7,7 @@ COPY react-app/ .
 RUN npm run build
 
 # Stage 2: Build the Java backend
-FROM maven:3.8.6-openjdk-17-slim AS backend-build
+FROM maven:3.8.8-eclipse-temurin-17 AS backend-build
 WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
