@@ -84,75 +84,38 @@ public class JpaConfiguration {
 		if (StringUtils.isNotBlank(explicitUrl)) {
 			dataSourceProperties.setUrl(explicitUrl);
 			applyExplicitCredentials(dataSourceProperties);
-			return;
+			logger.info("Configured datasource URL from DATASOURCE_ATSEA_URL.");
 		}
 
 		String databaseUrl = getEnv("DATABASE_URL");
-		if (StringUtils.isNotBlank(databaseUrl)) {
-			applyDatabaseUrl(dataSourceProperties, databaseUrl);
+		applyDatabaseUrlOverrides(dataSourceProperties, databaseUrl);
+
+		applyPgOverrides(dataSourceProperties);
+		applyFallbackCredentials(dataSourceProperties);
+		applyDriverFromUrl(dataSourceProperties);
+	}
+
+	private void applyDatabaseUrlOverrides(DataSourceProperties dataSourceProperties, String databaseUrl) {
+		if (StringUtils.isBlank(databaseUrl)) {
 			return;
 		}
 
-		String host = getEnv("PGHOST");
-		String database = getEnv("PGDATABASE");
-		if (StringUtils.isNotBlank(host) && StringUtils.isNotBlank(database)) {
-			String port = defaultIfBlank(getEnv("PGPORT"), "5432");
-			String jdbcUrl = "jdbc:postgresql://" + host + ":" + port + "/" + database;
-			String sslMode = getEnv("PGSSLMODE");
-			if (StringUtils.isNotBlank(sslMode)) {
-				jdbcUrl = jdbcUrl + "?sslmode=" + sslMode;
-			}
-			dataSourceProperties.setUrl(jdbcUrl);
-			String username = getEnv("PGUSER");
-			if (StringUtils.isNotBlank(username)) {
-				dataSourceProperties.setUsername(username);
-			}
-			String password = getEnv("PGPASSWORD");
-			if (StringUtils.isNotBlank(password)) {
-				dataSourceProperties.setPassword(password);
-			}
-			dataSourceProperties.setDriverClassName("org.postgresql.Driver");
-			logger.info("Configured datasource from PG* environment variables.");
+		ParsedDatabaseUrl parsed = parseDatabaseUrl(databaseUrl);
+		if (parsed == null) {
+			return;
 		}
-	}
 
-	private void applyDatabaseUrl(DataSourceProperties dataSourceProperties, String databaseUrl) {
-		try {
-			URI uri = new URI(databaseUrl);
-			String scheme = uri.getScheme();
-			if (!"postgres".equalsIgnoreCase(scheme) && !"postgresql".equalsIgnoreCase(scheme)) {
-				logger.warn("DATABASE_URL scheme '{}' is not PostgreSQL, skipping override.", scheme);
-				return;
-			}
-			String host = uri.getHost();
-			int port = uri.getPort() > 0 ? uri.getPort() : 5432;
-			String path = uri.getPath();
-			String database = StringUtils.removeStart(path, "/");
-			if (StringUtils.isBlank(host) || StringUtils.isBlank(database)) {
-				logger.warn("DATABASE_URL missing host or database name, skipping override.");
-				return;
-			}
-
-			String jdbcUrl = "jdbc:postgresql://" + host + ":" + port + "/" + database;
-			String query = uri.getQuery();
-			if (StringUtils.isNotBlank(query)) {
-				jdbcUrl = jdbcUrl + "?" + query;
-			}
-			dataSourceProperties.setUrl(jdbcUrl);
+		if (StringUtils.isBlank(dataSourceProperties.getUrl())) {
+			dataSourceProperties.setUrl(parsed.jdbcUrl);
 			dataSourceProperties.setDriverClassName("org.postgresql.Driver");
+			logger.info("Configured datasource URL from DATABASE_URL.");
+		}
 
-			String userInfo = uri.getUserInfo();
-			if (StringUtils.isNotBlank(userInfo)) {
-				String[] parts = userInfo.split(":", 2);
-				dataSourceProperties.setUsername(decodeUrlComponent(parts[0]));
-				if (parts.length > 1) {
-					dataSourceProperties.setPassword(decodeUrlComponent(parts[1]));
-				}
-			}
-
-			logger.info("Configured datasource from DATABASE_URL.");
-		} catch (URISyntaxException e) {
-			logger.warn("DATABASE_URL is not a valid URI, skipping override.");
+		if (StringUtils.isBlank(dataSourceProperties.getUsername()) && StringUtils.isNotBlank(parsed.username)) {
+			dataSourceProperties.setUsername(parsed.username);
+		}
+		if (StringUtils.isBlank(dataSourceProperties.getPassword()) && StringUtils.isNotBlank(parsed.password)) {
+			dataSourceProperties.setPassword(parsed.password);
 		}
 	}
 
@@ -171,6 +134,39 @@ public class JpaConfiguration {
 		}
 	}
 
+	private void applyPgOverrides(DataSourceProperties dataSourceProperties) {
+		if (StringUtils.isNotBlank(dataSourceProperties.getUrl())) {
+			return;
+		}
+		String host = getEnv("PGHOST");
+		String database = getEnv("PGDATABASE");
+		if (StringUtils.isBlank(host) || StringUtils.isBlank(database)) {
+			return;
+		}
+		String port = defaultIfBlank(getEnv("PGPORT"), "5432");
+		String jdbcUrl = "jdbc:postgresql://" + host + ":" + port + "/" + database;
+		String sslMode = getEnv("PGSSLMODE");
+		if (StringUtils.isNotBlank(sslMode)) {
+			jdbcUrl = jdbcUrl + "?sslmode=" + sslMode;
+		}
+		dataSourceProperties.setUrl(jdbcUrl);
+		logger.info("Configured datasource URL from PG* environment variables.");
+	}
+
+	private void applyFallbackCredentials(DataSourceProperties dataSourceProperties) {
+		String databaseUrl = getEnv("DATABASE_URL");
+		applyDatabaseUrlOverrides(dataSourceProperties, databaseUrl);
+
+		String username = defaultIfBlank(getEnv("PGUSER"), getEnv("POSTGRES_USER"));
+		if (StringUtils.isBlank(dataSourceProperties.getUsername()) && StringUtils.isNotBlank(username)) {
+			dataSourceProperties.setUsername(username);
+		}
+		String password = defaultIfBlank(getEnv("PGPASSWORD"), getEnv("POSTGRES_PASSWORD"));
+		if (StringUtils.isBlank(dataSourceProperties.getPassword()) && StringUtils.isNotBlank(password)) {
+			dataSourceProperties.setPassword(password);
+		}
+	}
+
 	private void applySecretPasswordOverride(DataSourceProperties dataSourceProperties) {
 		Path secretPath = Paths.get(POSTGRES_PASSWORD_SECRET);
 		if (!Files.exists(secretPath)) {
@@ -184,6 +180,16 @@ public class JpaConfiguration {
 			}
 		} catch (IOException e) {
 			logger.warn("Failed to read DB password secret file.", e);
+		}
+	}
+
+	private void applyDriverFromUrl(DataSourceProperties dataSourceProperties) {
+		if (StringUtils.isNotBlank(dataSourceProperties.getDriverClassName())) {
+			return;
+		}
+		String url = dataSourceProperties.getUrl();
+		if (StringUtils.isNotBlank(url) && url.startsWith("jdbc:postgresql:")) {
+			dataSourceProperties.setDriverClassName("org.postgresql.Driver");
 		}
 	}
 
@@ -215,6 +221,59 @@ public class JpaConfiguration {
 
 	private String getEnv(String key) {
 		return System.getenv(key);
+	}
+
+	private ParsedDatabaseUrl parseDatabaseUrl(String databaseUrl) {
+		try {
+			URI uri = new URI(databaseUrl);
+			String scheme = uri.getScheme();
+			if (!"postgres".equalsIgnoreCase(scheme) && !"postgresql".equalsIgnoreCase(scheme)) {
+				logger.warn("DATABASE_URL scheme '{}' is not PostgreSQL, skipping override.", scheme);
+				return null;
+			}
+			String host = uri.getHost();
+			int port = uri.getPort() > 0 ? uri.getPort() : 5432;
+			String path = uri.getPath();
+			String database = StringUtils.removeStart(path, "/");
+			if (StringUtils.isBlank(host) || StringUtils.isBlank(database)) {
+				logger.warn("DATABASE_URL missing host or database name, skipping override.");
+				return null;
+			}
+
+			String jdbcUrl = "jdbc:postgresql://" + host + ":" + port + "/" + database;
+			String query = uri.getQuery();
+			if (StringUtils.isNotBlank(query)) {
+				jdbcUrl = jdbcUrl + "?" + query;
+			}
+
+			String username = null;
+			String password = null;
+			String userInfo = uri.getUserInfo();
+			if (StringUtils.isNotBlank(userInfo)) {
+				String[] parts = userInfo.split(":", 2);
+				username = decodeUrlComponent(parts[0]);
+				if (parts.length > 1) {
+					password = decodeUrlComponent(parts[1]);
+				}
+			}
+
+			return new ParsedDatabaseUrl(jdbcUrl, username, password);
+		} catch (URISyntaxException e) {
+			logger.warn("DATABASE_URL is not a valid URI, skipping override.");
+			return null;
+		}
+	}
+
+	private static class ParsedDatabaseUrl {
+		private final String jdbcUrl;
+		private final String username;
+		private final String password;
+
+		private ParsedDatabaseUrl(String jdbcUrl, String username, String password) {
+			this.jdbcUrl = jdbcUrl;
+			this.username = username;
+			this.password = password;
+		}
 	}
 
 	/*
