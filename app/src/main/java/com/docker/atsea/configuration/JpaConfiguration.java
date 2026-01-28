@@ -81,21 +81,27 @@ public class JpaConfiguration {
 
 	private void applyRailwayOverrides(DataSourceProperties dataSourceProperties) {
 		String explicitUrl = getEnv("DATASOURCE_ATSEA_URL");
+		boolean explicitUrlSet = false;
 		if (StringUtils.isNotBlank(explicitUrl)) {
 			dataSourceProperties.setUrl(explicitUrl);
 			applyExplicitCredentials(dataSourceProperties);
 			logger.info("Configured datasource URL from DATASOURCE_ATSEA_URL.");
+			explicitUrlSet = true;
 		}
 
 		String databaseUrl = getEnv("DATABASE_URL");
-		applyDatabaseUrlOverrides(dataSourceProperties, databaseUrl);
+		applyDatabaseUrlOverrides(dataSourceProperties, databaseUrl, !explicitUrlSet);
 
-		applyPgOverrides(dataSourceProperties);
+		boolean allowPgOverride = !explicitUrlSet && StringUtils.isBlank(databaseUrl);
+		applyPgOverrides(dataSourceProperties, allowPgOverride);
 		applyFallbackCredentials(dataSourceProperties);
 		applyDriverFromUrl(dataSourceProperties);
 	}
 
-	private void applyDatabaseUrlOverrides(DataSourceProperties dataSourceProperties, String databaseUrl) {
+	private void applyDatabaseUrlOverrides(
+			DataSourceProperties dataSourceProperties,
+			String databaseUrl,
+			boolean allowOverride) {
 		if (StringUtils.isBlank(databaseUrl)) {
 			return;
 		}
@@ -105,7 +111,7 @@ public class JpaConfiguration {
 			return;
 		}
 
-		if (StringUtils.isBlank(dataSourceProperties.getUrl())) {
+		if (allowOverride || StringUtils.isBlank(dataSourceProperties.getUrl())) {
 			dataSourceProperties.setUrl(parsed.jdbcUrl);
 			dataSourceProperties.setDriverClassName("org.postgresql.Driver");
 			logger.info("Configured datasource URL from DATABASE_URL.");
@@ -134,8 +140,8 @@ public class JpaConfiguration {
 		}
 	}
 
-	private void applyPgOverrides(DataSourceProperties dataSourceProperties) {
-		if (StringUtils.isNotBlank(dataSourceProperties.getUrl())) {
+	private void applyPgOverrides(DataSourceProperties dataSourceProperties, boolean allowOverride) {
+		if (!allowOverride && StringUtils.isNotBlank(dataSourceProperties.getUrl())) {
 			return;
 		}
 		String host = getEnv("PGHOST");
@@ -155,7 +161,7 @@ public class JpaConfiguration {
 
 	private void applyFallbackCredentials(DataSourceProperties dataSourceProperties) {
 		String databaseUrl = getEnv("DATABASE_URL");
-		applyDatabaseUrlOverrides(dataSourceProperties, databaseUrl);
+		applyDatabaseUrlOverrides(dataSourceProperties, databaseUrl, false);
 
 		String username = defaultIfBlank(getEnv("PGUSER"), getEnv("POSTGRES_USER"));
 		if (StringUtils.isBlank(dataSourceProperties.getUsername()) && StringUtils.isNotBlank(username)) {
