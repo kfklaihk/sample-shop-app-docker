@@ -12,6 +12,7 @@ WORKDIR /app
 COPY app/pom.xml .
 RUN mvn dependency:go-offline -B
 COPY app/src ./src
+COPY --from=frontend-build /react-build/build ./src/main/resources/static
 RUN mvn package -DskipTests
 
 # Stage 3: Final runtime image
