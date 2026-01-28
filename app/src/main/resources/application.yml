@@ -102,7 +102,7 @@ datasource:
     minPoolSize: 6
     maxPoolSize: 15
     hibernate:
-      hbm2ddl.method: update
+      hbm2ddl.method: create
       show_sql: true
       format_sql: true
       dialect: org.hibernate.dialect.PostgreSQLDialect
