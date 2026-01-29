@@ -1,6 +1,7 @@
 package com.docker.atsea.model;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -24,7 +25,7 @@ public class Product implements Serializable {
     @Column(name = "name", length = 255, nullable = false)
     private String name;
     
-    @NotEmpty
+    @Positive
     @Column(name = "price", nullable = false)
     private double price;
     
