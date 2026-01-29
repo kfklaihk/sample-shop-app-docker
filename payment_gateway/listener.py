@@ -104,6 +104,35 @@ def callback(ch, method, properties, body):
         print(f" [!] Error processing event: {e}")
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
 
+def build_rabbitmq_parameters():
+    amqp_url = (
+        os.getenv('SPRING_RABBITMQ_URI')
+        or os.getenv('AMQP_URL')
+        or os.getenv('RABBITMQ_URL')
+    )
+    if amqp_url:
+        print(" [*] Using AMQP_URL for RabbitMQ connection.")
+        return pika.URLParameters(amqp_url)
+
+    host = os.getenv('RABBITMQ_HOST', 'rabbitmq')
+    port = int(os.getenv('RABBITMQ_PORT', '5672'))
+    username = os.getenv('RABBITMQ_USER') or os.getenv('RABBITMQ_USERNAME')
+    password = os.getenv('RABBITMQ_PASSWORD')
+    vhost = os.getenv('RABBITMQ_VHOST', '/')
+
+    credentials = None
+    if username and password:
+        credentials = pika.PlainCredentials(username, password)
+        print(" [*] Using explicit RabbitMQ credentials.")
+
+    return pika.ConnectionParameters(
+        host=host,
+        port=port,
+        virtual_host=vhost,
+        credentials=credentials
+    )
+
+
 def main():
     print(" [*] Payment Gateway Listener starting...")
     
@@ -111,16 +140,15 @@ def main():
     max_retries = 20
     retry_count = 0
     connection = None
+    parameters = build_rabbitmq_parameters()
     
     while retry_count < max_retries:
         try:
-            connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host='rabbitmq', port=5672)
-            )
+            connection = pika.BlockingConnection(parameters)
             break
-        except Exception:
+        except Exception as ex:
             retry_count += 1
-            print(f" [!] Connection to RabbitMQ failed. Retrying... ({retry_count}/{max_retries})")
+            print(f" [!] Connection to RabbitMQ failed: {ex}. Retrying... ({retry_count}/{max_retries})")
             time.sleep(5)
     
     if not connection:
