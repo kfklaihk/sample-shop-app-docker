@@ -17,6 +17,7 @@ site.conf
 *.svn
 *.bat
 *.json
+!app/src/main/resources/seed/products.json
 *.bak
 linux.md
 src/

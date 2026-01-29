@@ -13,6 +13,26 @@ const updateContext = (newValue) => {
   listeners.forEach(listener => listener(currentContextValue));
 };
 
+const buildErrorMessage = async (response, fallbackMessage) => {
+  try {
+    const errorBody = await response.json();
+    if (errorBody) {
+      if (typeof errorBody.message === 'string' && errorBody.message.trim()) {
+        return errorBody.message;
+      }
+      if (typeof errorBody.error === 'string' && errorBody.error.trim()) {
+        return errorBody.error;
+      }
+      if (Array.isArray(errorBody.details) && errorBody.details.length > 0) {
+        return errorBody.details.join(', ');
+      }
+    }
+  } catch (error) {
+    // Ignore JSON parsing errors and fall back to default message.
+  }
+  return fallbackMessage;
+};
+
 export class AuthConsumer extends Component {
   constructor(props) {
     super(props);
@@ -74,8 +94,8 @@ export class AuthProvider extends Component {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
+        const message = await buildErrorMessage(response, 'Login failed');
+        throw new Error(message);
       }
 
       const data = await response.json();
@@ -107,8 +127,8 @@ export class AuthProvider extends Component {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Registration failed');
+        const message = await buildErrorMessage(response, 'Registration failed');
+        throw new Error(message);
       }
 
       const data = await response.json();

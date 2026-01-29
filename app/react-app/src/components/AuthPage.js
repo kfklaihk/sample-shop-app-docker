@@ -22,6 +22,18 @@ class AuthPage extends Component {
     };
   }
 
+  componentDidMount() {
+    if (this.props.auth && this.props.auth.isAuthenticated) {
+      hashHistory.push('/');
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.auth.isAuthenticated && this.props.auth.isAuthenticated) {
+      hashHistory.push('/');
+    }
+  }
+
   handleInputChange = (field) => (event) => {
     this.setState({
       formData: {
@@ -53,6 +65,8 @@ class AuthPage extends Component {
           passwordConfirm: this.state.formData.passwordConfirm,
           name: this.state.formData.name,
         });
+        this.setState({ loading: false });
+        hashHistory.push('/'); // Redirect to home after registration
       }
     } catch (error) {
       this.setState({ error: error.message, loading: false });
