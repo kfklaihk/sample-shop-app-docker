@@ -1,6 +1,7 @@
 package com.docker.atsea.controller;
 
 import java.util.List;
+import java.security.Principal;
 
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -17,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.docker.atsea.model.Order;
+import com.docker.atsea.model.Customer;
 import com.docker.atsea.service.OrderService;
+import com.docker.atsea.service.CustomerService;
 import com.docker.atsea.util.CustomErrorType;
 
 @RestController
@@ -28,6 +31,9 @@ public class OrderController {
 	
 	@Autowired
 	OrderService orderService;
+
+	@Autowired
+	CustomerService customerService;
 	// -------------------------------------------------------------------
 	//                   Order methods
 	//--------------------------------------------------------------------
@@ -35,9 +41,18 @@ public class OrderController {
 
 	// -------------------Create an Order-------------------------------------------
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/order/", method = RequestMethod.POST)
-	public ResponseEntity<?> createOrder(@RequestBody Order order, UriComponentsBuilder ucBuilder) {
+	@RequestMapping(value = {"/order/", "/order"}, method = RequestMethod.POST)
+	public ResponseEntity<?> createOrder(@RequestBody Order order, UriComponentsBuilder ucBuilder, Principal principal) {
 		logger.info("Creating order : {}", order);
+
+		// If customerId is not provided, try to get it from authenticated principal
+		if ((order.getCustomerId() == null || order.getCustomerId() == 0) && principal != null) {
+			Customer customer = customerService.findByUserName(principal.getName());
+			if (customer != null) {
+				order.setCustomerId(customer.getCustomerId());
+				logger.info("Set customerId {} for order from principal {}", customer.getCustomerId(), principal.getName());
+			}
+		}
 
 		if (orderService.orderExists(order)) {
 			logger.error("Unable to create. An order with id {} already exist", order.getOrderId());
@@ -51,7 +66,7 @@ public class OrderController {
 		orderInfo.put("orderId", currentOrderId);
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.setLocation(ucBuilder.path("/api/order/").buildAndExpand(order.getOrderId()).toUri());
+		headers.setLocation(ucBuilder.path("/api/order/{orderId}").buildAndExpand(currentOrderId).toUri());
 		return new ResponseEntity<JSONObject>(orderInfo, HttpStatus.CREATED);
 	}
 
@@ -76,7 +91,7 @@ public class OrderController {
 	
 	// ------------------- Get All Orders-----------------------------
 	
-	@RequestMapping(value = "/order/", method = RequestMethod.GET)
+	@RequestMapping(value = {"/order/", "/order"}, method = RequestMethod.GET)
 	public ResponseEntity<List<Order>> listAllOrderss() {
 		List<Order> order = orderService.findAllOrders();
 		if (order.isEmpty()) {

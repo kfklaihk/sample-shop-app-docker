@@ -1,50 +1,20 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {
-  createCustomer,
-  loginCustomer,
-} from '../../actions';
+import { AuthConsumer } from '../../context/AuthContext';
 import {
   getIP,
   getHost,
+  getCartProducts,
+  getTotal,
+  getQuantityById,
+  getCustomerId,
 } from '../../reducers';
-import LoginForm from '../LoginForm';
-import CreateUserForm from '../CreateUserForm';
-import SuccessMessage from '../SuccessMessage';
 import FlatButton from 'material-ui/FlatButton';
-import Modal from 'react-modal';
 import Logo from '../Logo';
 import './styles.css';
 import '../globalStyles.css';
-import {
-  getJwtToken,
-  removeJwtToken,
-  setJwtToken,
-} from '../../actions/storage';
-import { SubmissionError } from 'redux-form'
-
-const customStyles = {
-  overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.97)',
-    boxShadow: '0 2px 4px 0 rgba(0, 0, 0, 0.27)',
-    height: '100%',
-    width: '100%',
-  },
-  content: {
-    top: '30%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-    border: '0x',
-  },
-};
+import CheckoutModal from '../CheckoutModal';
+import { fetchCart, createOrder, clearCartContents } from '../../actions';
 
 class TopNav extends Component {
   constructor(props) {
@@ -52,229 +22,199 @@ class TopNav extends Component {
     this.state = {
       isCreateModalOpen: false,
       isLoginModalOpen: false,
-      authenticated: (getJwtToken() !== null),
       loginSuccessful: false,
       createUserSuccessful: false,
+      isCheckoutOpen: false,
+      isProcessingCheckout: false,
+      checkoutError: '',
     };
   }
 
-  handleLoginSuccess = ({ value: { token } }, username) => {
-    setJwtToken(token);
-    this.setState({ authenticated: true });
-    this.setState({ loginSuccessful: true });
-  };
+  componentDidMount() {
+    const { auth, fetchCart } = this.props;
+    if (auth && auth.isAuthenticated) {
+      fetchCart();
+    }
+  }
 
-  handleCreateUserSuccess(username, password) {
-    const { loginCustomer } = this.props;
-    this.setState({ createUserSuccessful: true });
-
-    // temporary sleep so that login will work
-    var start = new Date().getTime();
-    for (var i = 0; i < 1e7; i++) {
-      if (new Date().getTime() - start > 1000) {
-        break;
-      }
+  componentDidUpdate(prevProps) {
+    const { auth, fetchCart } = this.props;
+    if (auth.isAuthenticated && !prevProps.auth.isAuthenticated) {
+      fetchCart();
     }
 
-    return loginCustomer(username, password)
-      .then((response) => {
-        this.handleLoginSuccess(response, username)
+    if (!auth.isAuthenticated && prevProps.auth.isAuthenticated && this.state.isCheckoutOpen) {
+      this.setState({ isCheckoutOpen: false, checkoutError: '', isProcessingCheckout: false });
+    }
+  }
+
+  openCreateModal = () => {
+    this.setState({ isCreateModalOpen: true });
+  };
+
+  closeCreateModal = () => {
+    this.setState({ isCreateModalOpen: false, createUserSuccessful: false });
+  };
+
+  openLoginModal = () => {
+    this.setState({ isLoginModalOpen: true });
+  };
+
+  closeLoginModal = () => {
+    this.setState({ isLoginModalOpen: false, loginSuccessful: false });
+  };
+
+  handleLogout = () => {
+    const { auth } = this.props;
+    auth.logout();
+  };
+
+  openCheckoutModal = () => {
+    const { fetchCart } = this.props;
+    fetchCart();
+    this.setState({ isCheckoutOpen: true, checkoutError: '' });
+  };
+
+  closeCheckoutModal = () => {
+    if (this.state.isProcessingCheckout) {
+      return;
+    }
+    this.setState({ isCheckoutOpen: false, checkoutError: '' });
+  };
+
+  handleConfirmCheckout = () => {
+    const { createOrder, quantityById, customerId } = this.props;
+    const orderQuantities = quantityById || {};
+    const itemsInCart = Object.keys(orderQuantities).length;
+
+    if (!itemsInCart) {
+      this.setState({ checkoutError: 'Your cart is empty.' });
+      return;
+    }
+
+    this.setState({ isProcessingCheckout: true, checkoutError: '' });
+
+    const payload = {
+      orderDate: new Date().toISOString(),
+      customerId: customerId || null,
+      quantityById: orderQuantities,
+    };
+
+    createOrder(payload)
+      .then(() => {
+        this.setState({ isProcessingCheckout: false, isCheckoutOpen: false });
       })
-      .catch(err => {
-        throw new SubmissionError({ _error: "Error logging in." })
+      .catch(() => {
+        this.setState({
+          isProcessingCheckout: false,
+          checkoutError: 'Failed to submit order. Please try again.',
+        });
       });
-  }
+  };
 
-  handleCreateUser = values => {
-    const {
-      username,
-      password,
-    } = values;
-    const { createCustomer } = this.props;
-    return createCustomer(username, password)
-      .then((response) => {
-        this.handleCreateUserSuccess(username, password)
+  handleFlushCheckout = () => {
+    const { clearCartContents } = this.props;
+
+    this.setState({ isProcessingCheckout: true, checkoutError: '' });
+
+    clearCartContents()
+      .then(() => {
+        this.setState({ isProcessingCheckout: false, isCheckoutOpen: false });
       })
-      .catch(err => {
-        throw new SubmissionError({ username: "Username already exists" })
+      .catch(() => {
+        this.setState({
+          isProcessingCheckout: false,
+          checkoutError: 'Failed to clear the cart. Please try again.',
+        });
       });
-  };
-
-  handleLogin = values => {
-    const {
-      username,
-      password,
-    } = values;
-    const { loginCustomer } = this.props;
-    return loginCustomer(username, password)
-      .then((response) => {
-        this.handleLoginSuccess(response, username)
-        this.toggleLoginModal();
-      })
-      .catch(err => {
-        throw new SubmissionError({ _error: "Error logging in." })
-      });
-  };
-
-  renderContainerId() {
-    const {ip, host} = this.props;
-    return (
-      <div className="containerSection">
-        {`IP: ${ip} HOST: ${host}`}
-      </div>
-    );
-  }
-
-  toggleCreateModal = () => {
-    this.setState({
-      isCreateModalOpen: !this.state.isCreateModalOpen,
-    });
-  };
-
-  toggleLoginModal = () => {
-    this.setState({
-      isLoginModalOpen: !this.state.isLoginModalOpen,
-    });
-  };
-
-  renderCreateModal = () => {
-    const successMessage = 'Congratulations! Your account has been created!';
-    const content = this.state.createUserSuccessful
-      ? <SuccessMessage
-        message={successMessage}
-        label={'Continue Shopping'}
-        handleClick={this.toggleCreateModal}
-      />
-      : <CreateUserForm onSubmit={this.handleCreateUser} onSubmitFail={this.handleSubmitFail} />;
-    return (
-      <Modal
-        isOpen={this.state.isCreateModalOpen}
-        onRequestClose={this.toggleCreateModal}
-        style={customStyles}
-        contentLabel={''}
-      >
-        <div className="formContainer">
-          {content}
-        </div>
-      </Modal>
-    );
-  };
-
-  renderLoginModal = () => {
-    return (
-      <Modal
-        isOpen={this.state.isLoginModalOpen}
-        onRequestClose={this.toggleLoginModal}
-        style={customStyles}
-        contentLabel={''}
-      >
-        <div className="formContainer">
-          <LoginForm onSubmit={this.handleLogin} />
-        </div>
-      </Modal>
-    );
-  };
-
-  renderUnauthenticated() {
-    const styles = {
-      color: '#fff',
-    };
-    const labelStyles = {
-      textTransform: 'none',
-      fontFamily: 'Open Sans',
-      fontWeight: 600,
-    };
-
-    return (
-      <div>
-        <FlatButton
-          style={styles}
-          labelStyle={labelStyles}
-          onClick={this.toggleCreateModal}
-          label="Create User"
-        />
-        <FlatButton
-          style={styles}
-          labelStyle={labelStyles}
-          onClick={this.toggleLoginModal}
-          label="Sign in"
-        />
-      </div>
-    );
-  }
-
-  renderAuthenticated() {
-    const styles = {
-      color: '#fff'
-    };
-    const labelStyles = {
-      textTransform: 'none',
-      fontFamily: 'Open Sans',
-      fontWeight: 600,
-    };
-    const welcome = 'Welcome!'
-    return (
-      <div>
-        <span className="welcomeMessage">
-          {welcome}
-        </span>
-        <FlatButton
-          style={styles}
-          labelStyle={labelStyles}
-          onClick={this.removeToken}
-          label="Sign out"
-        />
-      </div>
-    );
-  }
-
-  removeToken = () => {
-    removeJwtToken();
-    this.setState({
-      isCreateModalOpen: false,
-      isLoginModalOpen: false,
-      authenticated: false,
-      loginSuccessful: false,
-      createUserSuccessful: false,
-    });
   };
 
   render() {
+    const {
+      ip,
+      host,
+      auth,
+      cartItems,
+      cartTotal,
+    } = this.props;
+    const { isAuthenticated, user } = auth;
+    const { isCheckoutOpen, isProcessingCheckout, checkoutError } = this.state;
+    const cartCount = cartItems ? cartItems.length : 0;
+
     return (
-      <div className="globalContainer">
-        <div className="navHeader">
-          <div className="navLogo">
-            <Logo />
+      <div className="top-nav">
+        <div className="nav-container">
+          <Logo />
+          <div className="nav-info">
+            <span>Host: {host}</span>
+            <span>IP: {ip}</span>
           </div>
-          <div className="navUser">
-            {this.renderContainerId()}
-            <div className="buttonSection">
-              {this.state.authenticated
-                ? this.renderAuthenticated()
-                : this.renderUnauthenticated()}
-            </div>
-            {this.renderCreateModal()}
-            {this.renderLoginModal()}
+          <div className="nav-actions">
+            {isAuthenticated ? (
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ marginRight: '10px' }}>
+                  Welcome, {user && user.username || 'User'}
+                </span>
+                <FlatButton
+                  label={`Checkout (${cartCount})`}
+                  onClick={this.openCheckoutModal}
+                  style={{ color: '#fff', border: '1px solid rgba(255,255,255,0.5)', marginRight: '10px' }}
+                />
+                <FlatButton
+                  label="Logout"
+                  onClick={this.handleLogout}
+                  style={{ color: '#fff' }}
+                />
+              </div>
+            ) : (
+              <div>
+                <FlatButton
+                  label="Login"
+                  onClick={this.openLoginModal}
+                  style={{ color: '#fff' }}
+                />
+                <FlatButton
+                  label="Register"
+                  onClick={this.openCreateModal}
+                  style={{ color: '#fff' }}
+                />
+              </div>
+            )}
           </div>
         </div>
+        <CheckoutModal
+          open={isCheckoutOpen}
+          cartItems={cartItems}
+          total={cartTotal}
+          onClose={this.closeCheckoutModal}
+          onConfirm={this.handleConfirmCheckout}
+          onFlush={this.handleFlushCheckout}
+          isProcessing={isProcessingCheckout}
+          errorMessage={checkoutError}
+        />
       </div>
     );
   }
 }
 
-TopNav.propTypes = {
-  ip: PropTypes.string.isRequired,
-  host: PropTypes.string.isRequired,
-  createCustomer: PropTypes.func.isRequired,
-  loginCustomer: PropTypes.func.isRequired,
-};
+const TopNavWithAuth = (props) => (
+  <AuthConsumer>
+    {(auth) => <TopNav {...props} auth={auth} />}
+  </AuthConsumer>
+);
 
-const mapStateToProps = state => ({
-  ip: getIP(state),
-  host: getHost(state),
-});
-
-export default connect(mapStateToProps, {
-  createCustomer,
-  loginCustomer,
-})(TopNav);
+export default connect(
+  (state) => ({
+    ip: getIP(state),
+    host: getHost(state),
+    cartItems: getCartProducts(state),
+    cartTotal: getTotal(state),
+    quantityById: getQuantityById(state),
+    customerId: getCustomerId(state),
+  }),
+  {
+    fetchCart,
+    createOrder,
+    clearCartContents,
+  }
+)(TopNavWithAuth);

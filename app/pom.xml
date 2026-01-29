@@ -101,11 +101,48 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
-	<!-- Add JWT support -->
+	<!-- Add JWT support with refresh token capability -->
 	<dependency>
     	<groupId>io.jsonwebtoken</groupId>
-    	<artifactId>jjwt</artifactId>
-    	<version>0.7.0</version>
+    	<artifactId>jjwt-api</artifactId>
+    	<version>0.12.3</version>
+	</dependency>
+	<dependency>
+    	<groupId>io.jsonwebtoken</groupId>
+    	<artifactId>jjwt-impl</artifactId>
+    	<version>0.12.3</version>
+    	<scope>runtime</scope>
+	</dependency>
+	<dependency>
+    	<groupId>io.jsonwebtoken</groupId>
+    	<artifactId>jjwt-jackson</artifactId>
+    	<version>0.12.3</version>
+    	<scope>runtime</scope>
+	</dependency>
+	<!-- Add Spring Data Redis with Lettuce -->
+	<dependency>
+    	<groupId>org.springframework.boot</groupId>
+    	<artifactId>spring-boot-starter-data-redis</artifactId>
+	</dependency>
+	<dependency>
+    	<groupId>org.springframework.data</groupId>
+    	<artifactId>spring-data-redis</artifactId>
+    	<version>3.2.0</version>
+	</dependency>
+	<dependency>
+    	<groupId>io.lettuce</groupId>
+    	<artifactId>lettuce-core</artifactId>
+	</dependency>
+	<!-- Add Spring AMQP for RabbitMQ -->
+	<dependency>
+    	<groupId>org.springframework.boot</groupId>
+    	<artifactId>spring-boot-starter-amqp</artifactId>
+	</dependency>
+	<!-- Add Stripe Java SDK -->
+	<dependency>
+    	<groupId>com.stripe</groupId>
+    	<artifactId>stripe-java</artifactId>
+    	<version>24.13.0</version>
 	</dependency>
 	<!-- devtools support -->
 	<dependency>
@@ -143,6 +180,18 @@
   
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>17</source>
+          <target>17</target>
+          <compilerArgs>
+            <arg>--enable-preview</arg>
+            <arg>-Xlint:-deprecation</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
       <plugin><!-- Create a jar with all dependencies, run commandline using java -jar NAME -->
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>

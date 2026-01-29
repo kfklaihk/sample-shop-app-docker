@@ -17,9 +17,12 @@ site.conf
 *.svn
 *.bat
 *.json
+!app/src/main/resources/seed/products.json
 *.bak
 linux.md
 src/
+!app/src/
+!app/react-app/src/
 
 ###################
 *.com
