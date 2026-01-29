@@ -103,6 +103,7 @@ public class SecurityConfiguration {
                 // Public authentication endpoints
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/utility/**").permitAll()
+                .requestMatchers("/api/health/**").permitAll()
                 
                 // Public product endpoints (no auth required for browsing)
                 .requestMatchers("/api/product/**", "/api/product/").permitAll()
