@@ -8,6 +8,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.docker.atsea.configuration.RabbitMQConfig;
 import com.docker.atsea.dto.OrderEvent;
@@ -20,6 +22,8 @@ import com.docker.atsea.repositories.ProductRepository;
 @Service("orderService")
 @Transactional
 public class OrderServiceImpl implements OrderService {
+
+	private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
 	@Autowired
 	private OrderRepository orderRepository;
@@ -46,8 +50,13 @@ public class OrderServiceImpl implements OrderService {
 			OrderEvent event = enrichOrderEvent(order);
 			rabbitTemplate.convertAndSend(RabbitMQConfig.ORDERS_EXCHANGE, RabbitMQConfig.ORDERS_ROUTING_KEY, event);
 		} catch (Exception e) {
-			// Fail-safe to send the order as it is
-			rabbitTemplate.convertAndSend(RabbitMQConfig.ORDERS_EXCHANGE, RabbitMQConfig.ORDERS_ROUTING_KEY, order);
+			logger.warn("Failed to publish enriched order event to RabbitMQ.", e);
+			try {
+				// Fail-safe to send the order as it is
+				rabbitTemplate.convertAndSend(RabbitMQConfig.ORDERS_EXCHANGE, RabbitMQConfig.ORDERS_ROUTING_KEY, order);
+			} catch (Exception fallbackException) {
+				logger.warn("Failed to publish fallback order event to RabbitMQ.", fallbackException);
+			}
 		}
 
 		return order;
@@ -68,7 +77,11 @@ public class OrderServiceImpl implements OrderService {
 		// Set products and calculate total
 		List<OrderEvent.ProductDetail> productDetails = new ArrayList<>();
 		double total = 0;
-		for (Map.Entry<Integer, Integer> entry : order.getProductsOrdered().entrySet()) {
+		Map<Integer, Integer> productsOrdered = order.getProductsOrdered();
+		if (productsOrdered == null) {
+			productsOrdered = java.util.Collections.emptyMap();
+		}
+		for (Map.Entry<Integer, Integer> entry : productsOrdered.entrySet()) {
 			Long productId = Long.valueOf(entry.getKey());
 			Integer quantity = entry.getValue();
 			
