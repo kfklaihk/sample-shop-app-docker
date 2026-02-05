@@ -177,43 +177,41 @@ def build_rabbitmq_parameters():
 def main():
     print(" [*] Payment Gateway Listener starting...")
     start_health_server()
-    
-    # Wait for RabbitMQ to be ready
-    max_retries = 20
-    retry_count = 0
-    connection = None
+
     parameters = build_rabbitmq_parameters()
-    
-    while retry_count < max_retries:
+    while True:
+        health_state["rabbitmq_connected"] = False
+        connection = None
         try:
             connection = pika.BlockingConnection(parameters)
             health_state["rabbitmq_connected"] = True
+
+            channel = connection.channel()
+
+            # Ensure queue exists (Matching appserver configuration with TTL)
+            arguments = {'x-message-ttl': 86400000}
+            channel.queue_declare(queue='orders.created', durable=True, arguments=arguments)
+
+            print(' [*] Waiting for orders on queue "orders.created". To exit press CTRL+C')
+
+            channel.basic_qos(prefetch_count=1)
+            channel.basic_consume(queue='orders.created', on_message_callback=callback)
+            channel.start_consuming()
+        except KeyboardInterrupt:
+            print(" [*] Payment Gateway Listener shutting down.")
             break
         except Exception as ex:
-            retry_count += 1
-            print(f" [!] Connection to RabbitMQ failed: {ex}. Retrying... ({retry_count}/{max_retries})")
+            health_state["rabbitmq_connected"] = False
+            print(f" [!] RabbitMQ connection lost: {ex}. Retrying in 5 seconds...")
             time.sleep(5)
-    
-    if not connection:
-        print(" [!] Could not connect to RabbitMQ. Exiting.")
-        return
-
-    channel = connection.channel()
-
-    # Ensure queue exists (Matching appserver configuration with TTL)
-    arguments = {'x-message-ttl': 86400000}
-    channel.queue_declare(queue='orders.created', durable=True, arguments=arguments)
-    
-    print(' [*] Waiting for orders on queue "orders.created". To exit press CTRL+C')
-
-    channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(queue='orders.created', on_message_callback=callback)
-
-    try:
-        channel.start_consuming()
-    except KeyboardInterrupt:
-        channel.stop_consuming()
-        connection.close()
+        finally:
+            health_state["rabbitmq_connected"] = False
+            if connection is not None:
+                try:
+                    if connection.is_open:
+                        connection.close()
+                except Exception:
+                    pass
 
 if __name__ == '__main__':
     main()
