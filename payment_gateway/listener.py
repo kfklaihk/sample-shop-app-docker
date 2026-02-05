@@ -146,13 +146,19 @@ def start_health_server():
 
 
 def build_rabbitmq_parameters():
-    amqp_url = (
-        os.getenv('SPRING_RABBITMQ_URI')
-        or os.getenv('AMQP_URL')
-        or os.getenv('RABBITMQ_URL')
-    )
+    amqp_url = os.getenv('SPRING_RABBITMQ_URI')
+    if amqp_url:
+        print(" [*] Using SPRING_RABBITMQ_URI for RabbitMQ connection.")
+        return pika.URLParameters(amqp_url)
+
+    amqp_url = os.getenv('AMQP_URL')
     if amqp_url:
         print(" [*] Using AMQP_URL for RabbitMQ connection.")
+        return pika.URLParameters(amqp_url)
+
+    amqp_url = os.getenv('RABBITMQ_URL')
+    if amqp_url:
+        print(" [*] Using RABBITMQ_URL for RabbitMQ connection.")
         return pika.URLParameters(amqp_url)
 
     host = os.getenv('RABBITMQ_HOST', 'rabbitmq')
@@ -165,6 +171,15 @@ def build_rabbitmq_parameters():
     if username and password:
         credentials = pika.PlainCredentials(username, password)
         print(" [*] Using explicit RabbitMQ credentials.")
+    elif username or password:
+        print(" [!] RabbitMQ username or password missing.")
+
+    if host == 'rabbitmq' and os.getenv('RAILWAY_PROJECT_ID') and not os.getenv('RABBITMQ_HOST'):
+        print(" [!] RabbitMQ host not configured. On Railway, attach the RabbitMQ")
+        print("     service variables (RABBITMQ_URL/AMQP_URL) to payment_gateway.")
+
+    user_label = "set" if username else "not set"
+    print(f" [*] Using RabbitMQ host={host} port={port} vhost={vhost} user={user_label}")
 
     return pika.ConnectionParameters(
         host=host,
@@ -173,19 +188,42 @@ def build_rabbitmq_parameters():
         credentials=credentials
     )
 
+def connect_with_retries(parameters, max_retries, retry_interval):
+    retry_count = 0
+    while retry_count < max_retries:
+        try:
+            return pika.BlockingConnection(parameters)
+        except Exception as ex:
+            retry_count += 1
+            print(f" [!] Connection to RabbitMQ failed: {ex}. Retrying... ({retry_count}/{max_retries})")
+            time.sleep(retry_interval)
+    return None
+
 
 def main():
     print(" [*] Payment Gateway Listener starting...")
     start_health_server()
 
     parameters = build_rabbitmq_parameters()
+    max_retries = int(os.getenv('PAYMENT_GATEWAY_MAX_RETRIES', '20'))
+    retry_interval = int(os.getenv('PAYMENT_GATEWAY_RETRY_INTERVAL_SECONDS', '5'))
+    retry_mode = os.getenv('PAYMENT_GATEWAY_RETRY_MODE', 'bounded').lower()
+    cooldown = int(os.getenv('PAYMENT_GATEWAY_RETRY_COOLDOWN_SECONDS', '60'))
+
     while True:
         health_state["rabbitmq_connected"] = False
-        connection = None
-        try:
-            connection = pika.BlockingConnection(parameters)
-            health_state["rabbitmq_connected"] = True
+        connection = connect_with_retries(parameters, max_retries, retry_interval)
+        if not connection:
+            message = f" [!] Could not connect to RabbitMQ after {max_retries} attempts."
+            if retry_mode == 'loop':
+                print(f"{message} Sleeping {cooldown} seconds before retrying.")
+                time.sleep(cooldown)
+                continue
+            print(f"{message} Exiting.")
+            return
 
+        try:
+            health_state["rabbitmq_connected"] = True
             channel = connection.channel()
 
             # Ensure queue exists (Matching appserver configuration with TTL)
@@ -201,9 +239,7 @@ def main():
             print(" [*] Payment Gateway Listener shutting down.")
             break
         except Exception as ex:
-            health_state["rabbitmq_connected"] = False
-            print(f" [!] RabbitMQ connection lost: {ex}. Retrying in 5 seconds...")
-            time.sleep(5)
+            print(f" [!] RabbitMQ connection lost: {ex}.")
         finally:
             health_state["rabbitmq_connected"] = False
             if connection is not None:
