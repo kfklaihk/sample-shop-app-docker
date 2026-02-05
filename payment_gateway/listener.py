@@ -2,12 +2,18 @@ import pika
 import json
 import time
 import os
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from mailersend import MailerSendClient, EmailBuilder
 
 # MailerSend configuration
 MAILERSEND_API_KEY = os.getenv('MAILERSEND_API_KEY', 'mlsn.ad8c53a9a5e94c59dce0d29ebebd04ca6848835ced95fcbbd3300f1bd3d4976f')
 MAIL_FROM_EMAIL = os.getenv('MAIL_FROM_EMAIL', 'MS_Zz26ZQ@test-2p0347zo9x7lzdrn.mlsender.net')
 MAIL_FROM_NAME = os.getenv('MAIL_FROM_NAME', 'AtSea Shop Confirmation')
+
+health_state = {
+    "rabbitmq_connected": False
+}
 
 def send_confirmation_email(order_event):
     if not order_event.get('customerEmail'):
@@ -104,6 +110,41 @@ def callback(ch, method, properties, body):
         print(f" [!] Error processing event: {e}")
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
 
+
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path not in ('/health', '/healthz', '/'):
+            self.send_response(404)
+            self.end_headers()
+            return
+
+        rabbitmq_ok = health_state.get("rabbitmq_connected", False)
+        status_code = 200 if rabbitmq_ok else 503
+        payload = {
+            "status": "ok" if rabbitmq_ok else "down",
+            "rabbitmq": "up" if rabbitmq_ok else "down"
+        }
+        body = json.dumps(payload).encode("utf-8")
+
+        self.send_response(status_code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def log_message(self, format, *args):
+        # Silence default HTTP server logs.
+        return
+
+
+def start_health_server():
+    port = int(os.getenv('PAYMENT_GATEWAY_HEALTH_PORT', os.getenv('PORT', '8080')))
+    server = HTTPServer(('0.0.0.0', port), HealthHandler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    print(f" [*] Health server listening on 0.0.0.0:{port}")
+
+
 def build_rabbitmq_parameters():
     amqp_url = (
         os.getenv('SPRING_RABBITMQ_URI')
@@ -135,6 +176,7 @@ def build_rabbitmq_parameters():
 
 def main():
     print(" [*] Payment Gateway Listener starting...")
+    start_health_server()
     
     # Wait for RabbitMQ to be ready
     max_retries = 20
@@ -145,6 +187,7 @@ def main():
     while retry_count < max_retries:
         try:
             connection = pika.BlockingConnection(parameters)
+            health_state["rabbitmq_connected"] = True
             break
         except Exception as ex:
             retry_count += 1
