@@ -4,12 +4,13 @@ import time
 import os
 import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from mailersend import MailerSendClient, EmailBuilder
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
 
-# MailerSend configuration
-MAILERSEND_API_KEY = os.getenv('MAILERSEND_API_KEY', 'mlsn.ad8c53a9a5e94c59dce0d29ebebd04ca6848835ced95fcbbd3300f1bd3d4976f')
-MAIL_FROM_EMAIL = os.getenv('MAIL_FROM_EMAIL', 'MS_Zz26ZQ@test-2p0347zo9x7lzdrn.mlsender.net')
-MAIL_FROM_NAME = os.getenv('MAIL_FROM_NAME', 'AtSea Shop Confirmation')
+# Brevo configuration (Transactional Email)
+BREVO_API_KEY = os.getenv('BREVO_API_KEY', '')
+BREVO_FROM_EMAIL = os.getenv('BREVO_FROM_EMAIL', '')
+BREVO_FROM_NAME = os.getenv('BREVO_FROM_NAME', 'AtSea Shop Confirmation')
 
 health_state = {
     "rabbitmq_connected": False
@@ -20,10 +21,17 @@ def send_confirmation_email(order_event):
         print(" [!] No customer email found, skipping email.")
         return
 
+    if not BREVO_API_KEY or not BREVO_FROM_EMAIL:
+        print(" [!] Brevo is not configured (missing BREVO_API_KEY or BREVO_FROM_EMAIL).")
+        return
+
     try:
-        ms = MailerSendClient(api_key=MAILERSEND_API_KEY)
-        builder = EmailBuilder()
-        
+        configuration = sib_api_v3_sdk.Configuration()
+        configuration.api_key['api-key'] = BREVO_API_KEY
+        api_instance = sib_api_v3_sdk.TransactionalEmailsApi(
+            sib_api_v3_sdk.ApiClient(configuration)
+        )
+
         # Prepare products list for email
         products_html = "<ul>"
         products_text = ""
@@ -66,30 +74,21 @@ def send_confirmation_email(order_event):
         The AtSea Team
         """
 
-        builder.from_email(MAIL_FROM_EMAIL, MAIL_FROM_NAME)
-        builder.to(order_event['customerEmail'], customer_name)
-        builder.subject(f"Order Confirmation #{order_id}")
-        builder.html(html_content)
-        builder.text(text_content)
-
         print(f" [ ] Attempting to send email to {order_event['customerEmail']}...")
-        result = ms.emails.send(builder.build())
-        print(f" [v] Email sent via MailerSend. {result}")
+        email = sib_api_v3_sdk.SendSmtpEmail(
+            to=[{"email": order_event['customerEmail'], "name": customer_name}],
+            subject=f"Order Confirmation #{order_id}",
+            html_content=html_content,
+            text_content=text_content,
+            sender={"name": BREVO_FROM_NAME, "email": BREVO_FROM_EMAIL}
+        )
+        result = api_instance.send_transac_email(email)
+        print(f" [v] Email sent via Brevo. {result}")
 
+    except ApiException as e:
+        print(f" [!] Brevo API error: {e}")
     except Exception as e:
-        print(f" [!] Error sending email via MailerSend: {e}")
-        print(" [!] This usually happens because 'MAIL_FROM_EMAIL' domain is not verified in MailerSend.")
-        # Print full response details if available
-        if hasattr(e, 'response') and e.response:
-            try:
-                print(f" [!] Full API Response JSON: {e.response.json()}")
-            except:
-                print(f" [!] Response text: {e.response.text}")
-        print(" [!] --- MOCK EMAIL OUTPUT FOR DEBUGGING ---")
-        print(f" [!] TO: {order_event.get('customerEmail')}")
-        print(f" [!] SUBJECT: Order Confirmation #{order_id}")
-        print(f" [!] CONTENT:\n{text_content}")
-        print(" [!] ---------------------------------------")
+        print(f" [!] Error sending email via Brevo: {e}")
 
 def callback(ch, method, properties, body):
     try:
