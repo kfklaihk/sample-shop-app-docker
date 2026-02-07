@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { AuthConsumer } from '../../context/AuthContext';
 import {
   getIP,
-  getHost,
   getCartProducts,
   getTotal,
   getQuantityById,
@@ -62,11 +61,6 @@ class TopNav extends Component {
 
   closeLoginModal = () => {
     this.setState({ isLoginModalOpen: false, loginSuccessful: false });
-  };
-
-  handleLogout = () => {
-    const { auth } = this.props;
-    auth.logout();
   };
 
   openCheckoutModal = () => {
@@ -132,7 +126,6 @@ class TopNav extends Component {
   render() {
     const {
       ip,
-      host,
       auth,
       cartItems,
       cartTotal,
@@ -146,7 +139,6 @@ class TopNav extends Component {
         <div className="nav-container">
           <Logo />
           <div className="nav-info">
-            <span>Host: {host}</span>
             <span>IP: {ip}</span>
           </div>
           <div className="nav-actions">
@@ -158,12 +150,13 @@ class TopNav extends Component {
                 <FlatButton
                   label={`Checkout (${cartCount})`}
                   onClick={this.openCheckoutModal}
-                  style={{ color: '#fff', border: '1px solid rgba(255,255,255,0.5)', marginRight: '10px' }}
-                />
-                <FlatButton
-                  label="Logout"
-                  onClick={this.handleLogout}
-                  style={{ color: '#fff' }}
+                  style={{
+                    backgroundColor: '#099CEC',
+                    borderRadius: '4px',
+                    marginRight: '10px',
+                  }}
+                  hoverColor="#0b8bd1"
+                  labelStyle={{ color: '#fff', fontWeight: 600 }}
                 />
               </div>
             ) : (
@@ -206,7 +199,6 @@ const TopNavWithAuth = (props) => (
 export default connect(
   (state) => ({
     ip: getIP(state),
-    host: getHost(state),
     cartItems: getCartProducts(state),
     cartTotal: getTotal(state),
     quantityById: getQuantityById(state),
