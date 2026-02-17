@@ -6,6 +6,7 @@ import {
   CHECKOUT_FAILURE,
   CREATE_ORDER,
   PURCHASE,
+  FETCH_CART,
 } from '../constants/ActionTypes'
 
 const initialState = {
@@ -16,6 +17,8 @@ const initialState = {
 
 const addedIds = (state = initialState.addedIds, action) => {
   switch (action.type) {
+    case `${FETCH_CART}_ACK`:
+      return action.payload.map(item => item.productId)
     case ADD_TO_CART:
       if (state.indexOf(action.productId) !== -1) {
         return state
@@ -28,6 +31,11 @@ const addedIds = (state = initialState.addedIds, action) => {
 
 const quantityById = (state = initialState.quantityById, action) => {
   switch (action.type) {
+    case `${FETCH_CART}_ACK`:
+      return action.payload.reduce((obj, item) => {
+        obj[item.productId] = item.quantity
+        return obj
+      }, {})
     case ADD_TO_CART:
       const { productId } = action
       return {

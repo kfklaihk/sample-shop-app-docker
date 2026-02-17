@@ -1,0 +1,42 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+    hikari:
+      maximum-pool-size: 5
+  
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+# JWT Configuration for tests
+jwt:
+  secret: "test-secret-key-32-characters-long-123456789"
+  access-token-expiration: 900000
+  refresh-token-expiration: 604800000
+  user-id-claim-key: userId
+  roles-claim-key: roles
+
+# Redis Configuration (mocked in tests)
+spring.redis:
+  host: localhost
+  port: 6379
+
+# RabbitMQ Configuration (mocked in tests)
+spring.rabbitmq:
+  host: localhost
+  port: 5672
+  username: guest
+  password: guest

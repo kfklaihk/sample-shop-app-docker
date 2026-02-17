@@ -16,6 +16,9 @@ import App from './containers/App'
 import getMuiTheme from 'material-ui/styles/getMuiTheme'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import CheckoutContainer from './containers/CheckoutContainer'
+import { AuthProvider } from './context/AuthContext'
+import AuthPage from './components/AuthPage'
+import ProtectedRoute from './components/ProtectedRoute'
 
 
 const middleware = [
@@ -50,12 +53,15 @@ store.dispatch(fetchContainerId())
 
 render(
   <Provider store={store}>
-    <MuiThemeProvider muiTheme={muiTheme}>
-      <Router history={hashHistory}>
-        <Route path="/" component={App} />
-        <Route path="checkout" component={CheckoutContainer} />
-      </Router>
-    </MuiThemeProvider>
+    <AuthProvider>
+      <MuiThemeProvider muiTheme={muiTheme}>
+        <Router history={hashHistory}>
+          <Route path="/auth" component={AuthPage} />
+          <ProtectedRoute path="/" component={App} />
+          <ProtectedRoute path="/checkout" component={CheckoutContainer} />
+        </Router>
+      </MuiThemeProvider>
+    </AuthProvider>
   </Provider>,
   document.getElementById('root')
 )

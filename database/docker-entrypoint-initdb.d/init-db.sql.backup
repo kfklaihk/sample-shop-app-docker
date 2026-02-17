@@ -1,0 +1,115 @@
+-- create table for product
+
+CREATE TABLE product
+(
+  productid serial UNIQUE PRIMARY KEY,
+  description character varying(10485760) NOT NULL,
+  image character varying(255) NOT NULL,
+  name character varying(255) NOT NULL,
+  price double precision NOT NULL
+);
+
+ALTER TABLE product
+  OWNER TO gordonuser;
+
+ALTER ROLE gordonuser CONNECTION LIMIT -1;
+
+-- add product data
+-- note: images are pulled from the public folder at atsea/app/react-app/public
+INSERT INTO product (name, description, image, price) VALUES ('Stainless Steel Kitchen Knife Set', 'Professional 8-piece knife set with ergonomic handles and razor-sharp blades', '/images/1.png', 89.99);
+INSERT INTO product (name, description, image, price) VALUES ('Non-Stick Ceramic Cookware Set', '12-piece cookware set with ceramic non-stick coating, oven safe up to 500°F', '/images/2.png', 149.99);
+INSERT INTO product (name, description, image, price) VALUES ('Cordless Stick Vacuum Cleaner', 'Lightweight cordless vacuum with HEPA filter and 45-minute runtime', '/images/3.png', 199.99);
+INSERT INTO product (name, description, image, price) VALUES ('Memory Foam Mattress Topper', '2-inch gel-infused memory foam topper for enhanced comfort and support', '/images/4.png', 79.99);
+INSERT INTO product (name, description, image, price) VALUES ('LED Smart Bulbs - 4 Pack', 'Energy-efficient LED bulbs with WiFi connectivity and voice control compatibility', '/images/5.png', 34.99);
+INSERT INTO product (name, description, image, price) VALUES ('Bamboo Cutting Board Set', 'Set of 3 bamboo cutting boards in various sizes, naturally antibacterial', '/images/6.png', 29.99);
+INSERT INTO product (name, description, image, price) VALUES ('Robot Vacuum with Mapping', 'Smart robot vacuum with laser mapping technology and app control', '/images/7.png', 299.99);
+INSERT INTO product (name, description, image, price) VALUES ('Air Fryer - 5.8 Quart', 'Large capacity air fryer with digital controls and multiple cooking functions', '/images/8.png', 129.99);
+INSERT INTO product (name, description, image, price) VALUES ('Laundry Basket with Wheels', 'Collapsible laundry basket with wheels and ventilation holes', '/images/9.png', 24.99);
+INSERT INTO product (name, description, image, price) VALUES ('Coffee Maker with Grinder', '12-cup programmable coffee maker with built-in burr grinder', '/images/10.png', 89.99);
+INSERT INTO product (name, description, image, price) VALUES ('Dish Drying Rack', 'Over-the-sink dish drying rack with draining board and utensil holder', '/images/11.png', 39.99);
+INSERT INTO product (name, description, image, price) VALUES ('Blender with Personal Cups', 'High-speed blender with 2 personal blending cups and travel lids', '/images/12.png', 69.99);
+INSERT INTO product (name, description, image, price) VALUES ('Shower Curtain with Rings', 'Water-resistant shower curtain with 12 rust-proof metal rings', '/images/13.png', 19.99);
+INSERT INTO product (name, description, image, price) VALUES ('Toaster Oven - 6 Slice', 'Convection toaster oven with 6-slice capacity and multiple cooking functions', '/images/14.png', 79.99);
+INSERT INTO product (name, description, image, price) VALUES ('Bathroom Scale - Digital', 'Digital bathroom scale with tempered glass platform and backlit display', '/images/15.png', 29.99);
+INSERT INTO product (name, description, image, price) VALUES ('Can Opener - Electric', 'Automatic electric can opener with easy-clean design', '/images/16.png', 24.99);
+INSERT INTO product (name, description, image, price) VALUES ('Pillow Set - 2 Pack', 'Set of 2 hypoallergenic down alternative pillows with cooling technology', '/images/17.png', 49.99);
+INSERT INTO product (name, description, image, price) VALUES ('Waffle Maker - Belgian', 'Belgian waffle maker with non-stick grids and indicator lights', '/images/18.png', 39.99);
+INSERT INTO product (name, description, image, price) VALUES ('Laundry Detergent Pods', 'Laundry detergent pods, 81 count, for all machines and water temperatures', '/images/19.png', 14.99);
+INSERT INTO product (name, description, image, price) VALUES ('Dish Soap - Lemon Scent', 'Dishwashing liquid with plant-based ingredients and fresh lemon scent', '/images/20.png', 4.99);
+INSERT INTO product (name, description, image, price) VALUES ('Paper Towel Holder', 'Stainless steel paper towel holder with tension spring', '/images/21.png', 12.99);
+INSERT INTO product (name, description, image, price) VALUES ('Garbage Disposal Cleaner', 'Natural garbage disposal cleaner with baking soda and vinegar', '/images/22.png', 8.99);
+INSERT INTO product (name, description, image, price) VALUES ('Oven Mitts - Silicone', 'Heat-resistant silicone oven mitts with comfortable grip', '/images/23.png', 16.99);
+INSERT INTO product (name, description, image, price) VALUES ('Bath Towel Set - 6 Piece', '6-piece 100% cotton bath towel set with quick-dry technology', '/images/24.png', 59.99);
+INSERT INTO product (name, description, image, price) VALUES ('Refrigerator Magnets - Set of 8', 'Decorative refrigerator magnets with inspirational quotes', '/images/25.png', 9.99);
+INSERT INTO product (name, description, image, price) VALUES ('Floor Cleaner - Concentrate', 'Concentrated floor cleaner for hardwood, tile, and laminate floors', '/images/1.png', 12.99);
+INSERT INTO product (name, description, image, price) VALUES ('Window Cleaning Kit', 'Complete window cleaning kit with squeegee, bucket, and microfiber cloths', '/images/2.png', 24.99);
+INSERT INTO product (name, description, image, price) VALUES ('Bedroom Lamp - Modern', 'Modern LED bedroom lamp with adjustable brightness and USB charging port', '/images/3.png', 45.99);
+INSERT INTO product (name, description, image, price) VALUES ('Throw Blanket - Fleece', 'Ultra-soft microfleece throw blanket, machine washable', '/images/4.png', 19.99);
+INSERT INTO product (name, description, image, price) VALUES ('Wall Clock - Decorative', 'Decorative wall clock with silent quartz movement and easy-to-read numbers', '/images/5.png', 32.99);
+INSERT INTO product (name, description, image, price) VALUES ('Picture Frames - Set of 4', 'Set of 4 assorted size picture frames with easel backs', '/images/6.png', 18.99);
+INSERT INTO product (name, description, image, price) VALUES ('Area Rug - 5x7', 'Low-pile area rug with stain-resistant fibers and non-slip backing', '/images/7.png', 89.99);
+INSERT INTO product (name, description, image, price) VALUES ('Curtain Panels - Set of 2', 'Light-filtering curtain panels with rod pockets and tiebacks', '/images/8.png', 39.99);
+INSERT INTO product (name, description, image, price) VALUES ('Decorative Throw Pillows - Set of 3', 'Set of 3 decorative throw pillows with removable covers', '/images/9.png', 34.99);
+INSERT INTO product (name, description, image, price) VALUES ('Wall Art - Canvas Print', 'Gallery-wrapped canvas wall art with fade-resistant inks', '/images/10.png', 69.99);
+INSERT INTO product (name, description, image, price) VALUES ('Floor Lamp - Adjustable', 'Adjustable floor lamp with weighted base and energy-efficient bulb', '/images/11.png', 79.99);
+INSERT INTO product (name, description, image, price) VALUES ('Coasters - Absorbent Stone', 'Set of 6 absorbent stone coasters, heat-resistant up to 400°F', '/images/12.png', 14.99);
+INSERT INTO product (name, description, image, price) VALUES ('Vase - Ceramic', 'Modern ceramic vase with matte finish and wide opening', '/images/13.png', 27.99);
+INSERT INTO product (name, description, image, price) VALUES ('Bookends - Metal', 'Heavy-duty metal bookends with non-slip rubber feet', '/images/14.png', 22.99);
+INSERT INTO product (name, description, image, price) VALUES ('Wall Shelf - Floating', 'Floating wall shelf with invisible mounting hardware', '/images/15.png', 31.99);
+INSERT INTO product (name, description, image, price) VALUES ('Mirror - Wall Mounted', 'Frameless wall-mounted mirror with beveled edges', '/images/16.png', 49.99);
+INSERT INTO product (name, description, image, price) VALUES ('Candles - Scented Set', 'Set of 3 soy wax candles with essential oils and cotton wicks', '/images/17.png', 16.99);
+INSERT INTO product (name, description, image, price) VALUES ('Room Diffuser - Electric', 'Electric essential oil diffuser with LED lights and timer', '/images/18.png', 29.99);
+INSERT INTO product (name, description, image, price) VALUES ('Bathroom Organizer', 'Over-the-toilet bathroom organizer with shelves and hooks', '/images/19.png', 35.99);
+INSERT INTO product (name, description, image, price) VALUES ('Shower Caddy - Suction Cup', 'Shower caddy with strong suction cups and rust-resistant coating', '/images/20.png', 12.99);
+INSERT INTO product (name, description, image, price) VALUES ('Toothbrush Holder - Wall Mount', 'Wall-mounted toothbrush holder with drip tray', '/images/21.png', 8.99);
+INSERT INTO product (name, description, image, price) VALUES ('Soap Dispenser - Automatic', 'Touchless soap dispenser with adjustable portion control', '/images/22.png', 19.99);
+INSERT INTO product (name, description, image, price) VALUES ('Bath Mat - Memory Foam', 'Ultra-soft memory foam bath mat with non-slip backing', '/images/23.png', 24.99);
+INSERT INTO product (name, description, image, price) VALUES ('Towel Rack - Heated', 'Electric heated towel rack with adjustable temperature', '/images/24.png', 89.99);
+INSERT INTO product (name, description, image, price) VALUES ('Step Stool - Folding', 'Folding step stool with wide steps and carrying handle', '/images/25.png', 29.99);
+INSERT INTO product (name, description, image, price) VALUES ('Ironing Board Cover', 'Thick ironing board cover with heat-resistant silicone coating', '/images/1.png', 11.99);
+INSERT INTO product (name, description, image, price) VALUES ('Lint Roller - Refillable', 'Refillable lint roller with 60 sheets and ergonomic handle', '/images/2.png', 6.99);
+INSERT INTO product (name, description, image, price) VALUES ('Clothes Hangers - Velvet', 'Set of 30 velvet-covered clothes hangers with swivel hooks', '/images/3.png', 15.99);
+INSERT INTO product (name, description, image, price) VALUES ('Drawer Organizer - 6 Piece', '6-piece drawer organizer set with adjustable compartments', '/images/4.png', 19.99);
+INSERT INTO product (name, description, image, price) VALUES ('Shoe Rack - 3 Tier', '3-tier shoe rack with breathable mesh shelves', '/images/5.png', 34.99);
+INSERT INTO product (name, description, image, price) VALUES ('Closet Organizer - Hanging', 'Hanging closet organizer with multiple compartments and pockets', '/images/6.png', 22.99);
+INSERT INTO product (name, description, image, price) VALUES ('Laundry Hamper - Collapsible', 'Collapsible laundry hamper with reinforced handles', '/images/7.png', 16.99);
+INSERT INTO product (name, description, image, price) VALUES ('Iron - Steam', 'Professional steam iron with ceramic soleplate and auto shut-off', '/images/8.png', 49.99);
+INSERT INTO product (name, description, image, price) VALUES ('Sewing Kit - Deluxe', 'Deluxe sewing kit with 75 pieces including threads and needles', '/images/9.png', 12.99);
+INSERT INTO product (name, description, image, price) VALUES ('First Aid Kit - Home', 'Comprehensive home first aid kit with 200+ pieces', '/images/10.png', 24.99);
+INSERT INTO product (name, description, image, price) VALUES ('Digital Thermometer', 'Fast-reading digital thermometer with fever alert', '/images/11.png', 9.99);
+INSERT INTO product (name, description, image, price) VALUES ('Blood Pressure Monitor', 'Automatic blood pressure monitor with large display', '/images/12.png', 39.99);
+INSERT INTO product (name, description, image, price) VALUES ('Humidifier - Cool Mist', 'Cool mist humidifier with 1-gallon tank and quiet operation', '/images/13.png', 44.99);
+INSERT INTO product (name, description, image, price) VALUES ('Air Purifier - HEPA', 'HEPA air purifier with activated carbon filter and air quality sensor', '/images/14.png', 89.99);
+INSERT INTO product (name, description, image, price) VALUES ('Fan - Oscillating', '3-speed oscillating desk fan with adjustable height', '/images/15.png', 29.99);
+INSERT INTO product (name, description, image, price) VALUES ('Space Heater - Ceramic', 'Ceramic space heater with thermostat and tip-over protection', '/images/16.png', 34.99);
+INSERT INTO product (name, description, image, price) VALUES ('Extension Cord - Heavy Duty', 'Heavy-duty extension cord with 3 outlets and 15-foot length', '/images/17.png', 19.99);
+INSERT INTO product (name, description, image, price) VALUES ('Power Strip - Surge Protector', '8-outlet power strip with surge protection and USB ports', '/images/18.png', 24.99);
+INSERT INTO product (name, description, image, price) VALUES ('Flashlight - LED', 'High-lumen LED flashlight with multiple brightness settings', '/images/19.png', 16.99);
+INSERT INTO product (name, description, image, price) VALUES ('Batteries - AA Pack', '24-pack of long-lasting AA alkaline batteries', '/images/20.png', 8.99);
+INSERT INTO product (name, description, image, price) VALUES ('Tool Set - 40 Piece', '40-piece household tool set with storage case', '/images/21.png', 39.99);
+INSERT INTO product (name, description, image, price) VALUES ('Screwdriver Set - Precision', 'Precision screwdriver set with 24 different tips', '/images/22.png', 14.99);
+INSERT INTO product (name, description, image, price) VALUES ('Hammer - Claw', '16 oz claw hammer with fiberglass handle', '/images/23.png', 18.99);
+INSERT INTO product (name, description, image, price) VALUES ('Tape Measure - 25 Foot', '25-foot tape measure with lock and belt clip', '/images/24.png', 9.99);
+INSERT INTO product (name, description, image, price) VALUES ('Level - Magnetic', '24-inch magnetic level with horizontal and vertical vials', '/images/25.png', 12.99);
+INSERT INTO product (name, description, image, price) VALUES ('Paint Brush Set', 'Set of 5 paint brushes in various sizes with synthetic bristles', '/images/1.png', 13.99);
+INSERT INTO product (name, description, image, price) VALUES ('Drop Cloth - Canvas', 'Heavy-duty canvas drop cloth, 9x12 feet', '/images/2.png', 21.99);
+INSERT INTO product (name, description, image, price) VALUES ('Sandpaper Assortment', 'Assorted grit sandpaper sheets, 50-pack', '/images/3.png', 7.99);
+INSERT INTO product (name, description, image, price) VALUES ('Caulk Gun - Professional', 'Professional caulk gun with drip-free design', '/images/4.png', 16.99);
+INSERT INTO product (name, description, image, price) VALUES ('Putty Knife Set', 'Set of 4 putty knives in various sizes', '/images/5.png', 11.99);
+INSERT INTO product (name, description, image, price) VALUES ('Picture Hanging Kit', 'Complete picture hanging kit with level, tape measure, and hooks', '/images/6.png', 8.99);
+INSERT INTO product (name, description, image, price) VALUES ('Step Ladder - 6 Foot', '6-foot aluminum step ladder with wide steps', '/images/7.png', 69.99);
+INSERT INTO product (name, description, image, price) VALUES ('Garden Hose - 50 Foot', '50-foot garden hose with brass couplings and anti-kink design', '/images/8.png', 29.99);
+INSERT INTO product (name, description, image, price) VALUES ('Sprinkler - Oscillating', 'Oscillating lawn sprinkler with adjustable spray patterns', '/images/9.png', 19.99);
+INSERT INTO product (name, description, image, price) VALUES ('Garden Gloves - Leather', 'Durable leather garden gloves with reinforced palms', '/images/10.png', 12.99);
+INSERT INTO product (name, description, image, price) VALUES ('Pruning Shears - Professional', 'Professional bypass pruning shears with ergonomic handles', '/images/11.png', 24.99);
+INSERT INTO product (name, description, image, price) VALUES ('Wheelbarrow - Folding', 'Folding wheelbarrow with pneumatic tires', '/images/12.png', 79.99);
+INSERT INTO product (name, description, image, price) VALUES ('Outdoor Broom', 'Heavy-duty outdoor broom with sturdy bristles', '/images/13.png', 14.99);
+INSERT INTO product (name, description, image, price) VALUES ('Deck Box - Storage', 'Weather-resistant deck storage box with hinged lid', '/images/14.png', 89.99);
+INSERT INTO product (name, description, image, price) VALUES ('Patio Furniture Set', '4-piece patio furniture set with aluminum frames and cushions', '/images/15.png', 299.99);
+INSERT INTO product (name, description, image, price) VALUES ('BBQ Grill - Charcoal', '22-inch charcoal grill with adjustable air vents', '/images/16.png', 79.99);
+INSERT INTO product (name, description, image, price) VALUES ('Grill Brush - Heavy Duty', 'Heavy-duty grill brush with replaceable scraper head', '/images/17.png', 9.99);
+INSERT INTO product (name, description, image, price) VALUES ('Cooler - 54 Quart', '54-quart wheeled cooler with cup holders and drain plug', '/images/18.png', 49.99);
+INSERT INTO product (name, description, image, price) VALUES ('Picnic Blanket', 'Water-resistant picnic blanket with carrying strap', '/images/19.png', 16.99);
+INSERT INTO product (name, description, image, price) VALUES ('Outdoor Lanterns - Solar', 'Set of 4 solar-powered outdoor lanterns with LED lights', '/images/20.png', 34.99);
+
+

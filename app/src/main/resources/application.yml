@@ -2,6 +2,51 @@
 server:
   port: 8080
   contextPath: /
+  
+# JWT Configuration (common to all profiles)
+jwt:
+  secret: "my-super-secret-jwt-key-must-be-at-least-32-characters-long"
+  access-token-expiration: 900000  # 15 minutes in milliseconds
+  refresh-token-expiration: 604800000  # 7 days in milliseconds
+  user-id-claim-key: userId
+  roles-claim-key: roles
+
+# Redis Configuration (common to all profiles)
+spring:
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 60000
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        
+  # RabbitMQ Configuration
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1000
+          max-interval: 10000
+          multiplier: 2.0
+
+  web:
+    resources:
+      static-locations: file:/static/
+
+# Stripe Configuration
+stripe:
+  api-key: "${STRIPE_API_KEY:sk_test_placeholder}"
+  webhook-secret: "${STRIPE_WEBHOOK_SECRET:whsec_placeholder}"
+
 ---
 spring:
   config:
@@ -32,6 +77,14 @@ spring:
       enabled: true
     livereload:
       enabled: true
+  redis:
+    host: redis
+    port: 6379
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
 datasource:
   atsea:
     url: jdbc:postgresql://database:5432/atsea

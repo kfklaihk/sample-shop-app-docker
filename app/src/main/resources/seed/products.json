@@ -1,0 +1,482 @@
+[
+  {
+    "name": "Stainless Steel Kitchen Knife Set",
+    "description": "Professional 8-piece knife set with ergonomic handles and razor-sharp blades",
+    "image": "/images/1.png",
+    "price": 89.99
+  },
+  {
+    "name": "Non-Stick Ceramic Cookware Set",
+    "description": "12-piece cookware set with ceramic non-stick coating, oven safe up to 500\u00b0F",
+    "image": "/images/2.png",
+    "price": 149.99
+  },
+  {
+    "name": "Cordless Stick Vacuum Cleaner",
+    "description": "Lightweight cordless vacuum with HEPA filter and 45-minute runtime",
+    "image": "/images/3.png",
+    "price": 199.99
+  },
+  {
+    "name": "Memory Foam Mattress Topper",
+    "description": "2-inch gel-infused memory foam topper for enhanced comfort and support",
+    "image": "/images/4.png",
+    "price": 79.99
+  },
+  {
+    "name": "LED Smart Bulbs - 4 Pack",
+    "description": "Energy-efficient LED bulbs with WiFi connectivity and voice control compatibility",
+    "image": "/images/5.png",
+    "price": 34.99
+  },
+  {
+    "name": "Bamboo Cutting Board Set",
+    "description": "Set of 3 bamboo cutting boards in various sizes, naturally antibacterial",
+    "image": "/images/6.png",
+    "price": 29.99
+  },
+  {
+    "name": "Robot Vacuum with Mapping",
+    "description": "Smart robot vacuum with laser mapping technology and app control",
+    "image": "/images/7.png",
+    "price": 299.99
+  },
+  {
+    "name": "Air Fryer - 5.8 Quart",
+    "description": "Large capacity air fryer with digital controls and multiple cooking functions",
+    "image": "/images/8.png",
+    "price": 129.99
+  },
+  {
+    "name": "Laundry Basket with Wheels",
+    "description": "Collapsible laundry basket with wheels and ventilation holes",
+    "image": "/images/9.png",
+    "price": 24.99
+  },
+  {
+    "name": "Coffee Maker with Grinder",
+    "description": "12-cup programmable coffee maker with built-in burr grinder",
+    "image": "/images/10.png",
+    "price": 89.99
+  },
+  {
+    "name": "Dish Drying Rack",
+    "description": "Over-the-sink dish drying rack with draining board and utensil holder",
+    "image": "/images/11.png",
+    "price": 39.99
+  },
+  {
+    "name": "Blender with Personal Cups",
+    "description": "High-speed blender with 2 personal blending cups and travel lids",
+    "image": "/images/12.png",
+    "price": 69.99
+  },
+  {
+    "name": "Shower Curtain with Rings",
+    "description": "Water-resistant shower curtain with 12 rust-proof metal rings",
+    "image": "/images/13.png",
+    "price": 19.99
+  },
+  {
+    "name": "Toaster Oven - 6 Slice",
+    "description": "Convection toaster oven with 6-slice capacity and multiple cooking functions",
+    "image": "/images/14.png",
+    "price": 79.99
+  },
+  {
+    "name": "Bathroom Scale - Digital",
+    "description": "Digital bathroom scale with tempered glass platform and backlit display",
+    "image": "/images/15.png",
+    "price": 29.99
+  },
+  {
+    "name": "Can Opener - Electric",
+    "description": "Automatic electric can opener with easy-clean design",
+    "image": "/images/16.png",
+    "price": 24.99
+  },
+  {
+    "name": "Pillow Set - 2 Pack",
+    "description": "Set of 2 hypoallergenic down alternative pillows with cooling technology",
+    "image": "/images/17.png",
+    "price": 49.99
+  },
+  {
+    "name": "Waffle Maker - Belgian",
+    "description": "Belgian waffle maker with non-stick grids and indicator lights",
+    "image": "/images/18.png",
+    "price": 39.99
+  },
+  {
+    "name": "Laundry Detergent Pods",
+    "description": "Laundry detergent pods, 81 count, for all machines and water temperatures",
+    "image": "/images/19.png",
+    "price": 14.99
+  },
+  {
+    "name": "Dish Soap - Lemon Scent",
+    "description": "Dishwashing liquid with plant-based ingredients and fresh lemon scent",
+    "image": "/images/20.png",
+    "price": 4.99
+  },
+  {
+    "name": "Paper Towel Holder",
+    "description": "Stainless steel paper towel holder with tension spring",
+    "image": "/images/21.png",
+    "price": 12.99
+  },
+  {
+    "name": "Garbage Disposal Cleaner",
+    "description": "Natural garbage disposal cleaner with baking soda and vinegar",
+    "image": "/images/22.png",
+    "price": 8.99
+  },
+  {
+    "name": "Oven Mitts - Silicone",
+    "description": "Heat-resistant silicone oven mitts with comfortable grip",
+    "image": "/images/23.png",
+    "price": 16.99
+  },
+  {
+    "name": "Bath Towel Set - 6 Piece",
+    "description": "6-piece 100% cotton bath towel set with quick-dry technology",
+    "image": "/images/24.png",
+    "price": 59.99
+  },
+  {
+    "name": "Refrigerator Magnets - Set of 8",
+    "description": "Decorative refrigerator magnets with inspirational quotes",
+    "image": "/images/25.png",
+    "price": 9.99
+  },
+  {
+    "name": "Floor Cleaner - Concentrate",
+    "description": "Concentrated floor cleaner for hardwood, tile, and laminate floors",
+    "image": "/images/26.png",
+    "price": 12.99
+  },
+  {
+    "name": "Window Cleaning Kit",
+    "description": "Complete window cleaning kit with squeegee, bucket, and microfiber cloths",
+    "image": "/images/27.png",
+    "price": 24.99
+  },
+  {
+    "name": "Bedroom Lamp - Modern",
+    "description": "Modern LED bedroom lamp with adjustable brightness and USB charging port",
+    "image": "/images/28.png",
+    "price": 45.99
+  },
+  {
+    "name": "Throw Blanket - Fleece",
+    "description": "Ultra-soft microfleece throw blanket, machine washable",
+    "image": "/images/29.png",
+    "price": 19.99
+  },
+  {
+    "name": "Wall Clock - Decorative",
+    "description": "Decorative wall clock with silent quartz movement and easy-to-read numbers",
+    "image": "/images/30.png",
+    "price": 32.99
+  },
+  {
+    "name": "Picture Frames - Set of 4",
+    "description": "Set of 4 assorted size picture frames with easel backs",
+    "image": "/images/31.png",
+    "price": 18.99
+  },
+  {
+    "name": "Area Rug - 5x7",
+    "description": "Low-pile area rug with stain-resistant fibers and non-slip backing",
+    "image": "/images/32.png",
+    "price": 89.99
+  },
+  {
+    "name": "Curtain Panels - Set of 2",
+    "description": "Light-filtering curtain panels with rod pockets and tiebacks",
+    "image": "/images/33.png",
+    "price": 39.99
+  },
+  {
+    "name": "Decorative Throw Pillows - Set of 3",
+    "description": "Set of 3 decorative throw pillows with removable covers",
+    "image": "/images/34.png",
+    "price": 34.99
+  },
+  {
+    "name": "Wall Art - Canvas Print",
+    "description": "Gallery-wrapped canvas wall art with fade-resistant inks",
+    "image": "/images/35.png",
+    "price": 69.99
+  },
+  {
+    "name": "Floor Lamp - Adjustable",
+    "description": "Adjustable floor lamp with weighted base and energy-efficient bulb",
+    "image": "/images/36.png",
+    "price": 79.99
+  },
+  {
+    "name": "Coasters - Absorbent Stone",
+    "description": "Set of 6 absorbent stone coasters, heat-resistant up to 400\u00b0F",
+    "image": "/images/37.png",
+    "price": 14.99
+  },
+  {
+    "name": "Vase - Ceramic",
+    "description": "Modern ceramic vase with matte finish and wide opening",
+    "image": "/images/38.png",
+    "price": 27.99
+  },
+  {
+    "name": "Bookends - Metal",
+    "description": "Heavy-duty metal bookends with non-slip rubber feet",
+    "image": "/images/39.png",
+    "price": 22.99
+  },
+  {
+    "name": "Wall Shelf - Floating",
+    "description": "Floating wall shelf with invisible mounting hardware",
+    "image": "/images/40.png",
+    "price": 31.99
+  },
+  {
+    "name": "Mirror - Wall Mounted",
+    "description": "Frameless wall-mounted mirror with beveled edges",
+    "image": "/images/41.png",
+    "price": 49.99
+  },
+  {
+    "name": "Candles - Scented Set",
+    "description": "Set of 3 soy wax candles with essential oils and cotton wicks",
+    "image": "/images/42.png",
+    "price": 16.99
+  },
+  {
+    "name": "Room Diffuser - Electric",
+    "description": "Electric essential oil diffuser with LED lights and timer",
+    "image": "/images/43.png",
+    "price": 29.99
+  },
+  {
+    "name": "Bathroom Organizer",
+    "description": "Over-the-toilet bathroom organizer with shelves and hooks",
+    "image": "/images/44.png",
+    "price": 35.99
+  },
+  {
+    "name": "Shower Caddy - Suction Cup",
+    "description": "Shower caddy with strong suction cups and rust-resistant coating",
+    "image": "/images/45.png",
+    "price": 12.99
+  },
+  {
+    "name": "Toothbrush Holder - Wall Mount",
+    "description": "Wall-mounted toothbrush holder with drip tray",
+    "image": "/images/46.png",
+    "price": 8.99
+  },
+  {
+    "name": "Soap Dispenser - Automatic",
+    "description": "Touchless soap dispenser with adjustable portion control",
+    "image": "/images/47.png",
+    "price": 19.99
+  },
+  {
+    "name": "Bath Mat - Memory Foam",
+    "description": "Ultra-soft memory foam bath mat with non-slip backing",
+    "image": "/images/48.png",
+    "price": 24.99
+  },
+  {
+    "name": "Towel Rack - Heated",
+    "description": "Electric heated towel rack with adjustable temperature",
+    "image": "/images/49.png",
+    "price": 89.99
+  },
+  {
+    "name": "Step Stool - Folding",
+    "description": "Folding step stool with wide steps and carrying handle",
+    "image": "/images/50.png",
+    "price": 29.99
+  },
+  {
+    "name": "Ironing Board Cover",
+    "description": "Thick ironing board cover with heat-resistant silicone coating",
+    "image": "/images/51.png",
+    "price": 11.99
+  },
+  {
+    "name": "Lint Roller - Refillable",
+    "description": "Refillable lint roller with 60 sheets and ergonomic handle",
+    "image": "/images/52.png",
+    "price": 6.99
+  },
+  {
+    "name": "Clothes Hangers - Velvet",
+    "description": "Set of 30 velvet-covered clothes hangers with swivel hooks",
+    "image": "/images/53.png",
+    "price": 15.99
+  },
+  {
+    "name": "Drawer Organizer - 6 Piece",
+    "description": "6-piece drawer organizer set with adjustable compartments",
+    "image": "/images/54.png",
+    "price": 19.99
+  },
+  {
+    "name": "Shoe Rack - 3 Tier",
+    "description": "3-tier shoe rack with breathable mesh shelves",
+    "image": "/images/55.png",
+    "price": 34.99
+  },
+  {
+    "name": "Closet Organizer - Hanging",
+    "description": "Hanging closet organizer with multiple compartments and pockets",
+    "image": "/images/56.png",
+    "price": 22.99
+  },
+  {
+    "name": "Laundry Hamper - Collapsible",
+    "description": "Collapsible laundry hamper with reinforced handles",
+    "image": "/images/57.png",
+    "price": 16.99
+  },
+  {
+    "name": "Iron - Steam",
+    "description": "Professional steam iron with ceramic soleplate and auto shut-off",
+    "image": "/images/58.png",
+    "price": 49.99
+  },
+  {
+    "name": "Sewing Kit - Deluxe",
+    "description": "Deluxe sewing kit with 75 pieces including threads and needles",
+    "image": "/images/59.png",
+    "price": 12.99
+  },
+  {
+    "name": "First Aid Kit - Home",
+    "description": "Comprehensive home first aid kit with 200+ pieces",
+    "image": "/images/60.png",
+    "price": 24.99
+  },
+  {
+    "name": "Digital Thermometer",
+    "description": "Fast-reading digital thermometer with fever alert",
+    "image": "/images/61.png",
+    "price": 9.99
+  },
+  {
+    "name": "Blood Pressure Monitor",
+    "description": "Automatic blood pressure monitor with large display",
+    "image": "/images/62.png",
+    "price": 39.99
+  },
+  {
+    "name": "Humidifier - Cool Mist",
+    "description": "Cool mist humidifier with 1-gallon tank and quiet operation",
+    "image": "/images/63.png",
+    "price": 44.99
+  },
+  {
+    "name": "Air Purifier - HEPA",
+    "description": "HEPA air purifier with activated carbon filter and air quality sensor",
+    "image": "/images/64.png",
+    "price": 89.99
+  },
+  {
+    "name": "Fan - Oscillating",
+    "description": "3-speed oscillating desk fan with adjustable height",
+    "image": "/images/65.png",
+    "price": 29.99
+  },
+  {
+    "name": "Space Heater - Ceramic",
+    "description": "Ceramic space heater with thermostat and tip-over protection",
+    "image": "/images/66.png",
+    "price": 34.99
+  },
+  {
+    "name": "Extension Cord - Heavy Duty",
+    "description": "Heavy-duty extension cord with 3 outlets and 15-foot length",
+    "image": "/images/67.png",
+    "price": 19.99
+  },
+  {
+    "name": "Power Strip - Surge Protector",
+    "description": "8-outlet power strip with surge protection and USB ports",
+    "image": "/images/68.png",
+    "price": 24.99
+  },
+  {
+    "name": "Flashlight - LED",
+    "description": "High-lumen LED flashlight with multiple brightness settings",
+    "image": "/images/69.png",
+    "price": 16.99
+  },
+  {
+    "name": "Batteries - AA Pack",
+    "description": "24-pack of long-lasting AA alkaline batteries",
+    "image": "/images/70.png",
+    "price": 8.99
+  },
+  {
+    "name": "Tool Set - 40 Piece",
+    "description": "40-piece household tool set with storage case",
+    "image": "/images/71.png",
+    "price": 39.99
+  },
+  {
+    "name": "Screwdriver Set - Precision",
+    "description": "Precision screwdriver set with 24 different tips",
+    "image": "/images/72.png",
+    "price": 14.99
+  },
+  {
+    "name": "Hammer - Claw",
+    "description": "16 oz claw hammer with fiberglass handle",
+    "image": "/images/73.png",
+    "price": 18.99
+  },
+  {
+    "name": "Tape Measure - 25 Foot",
+    "description": "25-foot tape measure with lock and belt clip",
+    "image": "/images/74.png",
+    "price": 9.99
+  },
+  {
+    "name": "Level - Magnetic",
+    "description": "24-inch magnetic level with horizontal and vertical vials",
+    "image": "/images/75.png",
+    "price": 12.99
+  },
+  {
+    "name": "Paint Brush Set",
+    "description": "Set of 5 paint brushes in various sizes with synthetic bristles",
+    "image": "/images/76.png",
+    "price": 13.99
+  },
+  {
+    "name": "Drop Cloth - Canvas",
+    "description": "Heavy-duty canvas drop cloth, 9x12 feet",
+    "image": "/images/77.png",
+    "price": 21.99
+  },
+  {
+    "name": "Sandpaper Assortment",
+    "description": "Assorted grit sandpaper sheets, 50-pack",
+    "image": "/images/78.png",
+    "price": 7.99
+  },
+  {
+    "name": "Caulk Gun - Professional",
+    "description": "Professional caulk gun with drip-free design",
+    "image": "/images/79.png",
+    "price": 16.99
+  },
+  {
+    "name": "Putty Knife Set",
+    "description": "Set of 4 putty knives in various sizes",
+    "image": "/images/80.png",
+    "price": 11.99
+  }
+]

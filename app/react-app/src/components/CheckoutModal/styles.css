@@ -1,0 +1,130 @@
+.checkout-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.checkout-modal {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(22, 45, 61, 0.35);
+  width: 90%;
+  max-width: 520px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.checkout-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5ebf0;
+}
+
+.checkout-modal__title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #162d3d;
+}
+
+.checkout-modal__close {
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: #6b7c88;
+}
+
+.checkout-modal__close:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.checkout-modal__body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+.checkout-modal__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkout-modal__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e5ebf0;
+  border-radius: 6px;
+  background-color: #f9fbfc;
+}
+
+.checkout-modal__product-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #162d3d;
+}
+
+.checkout-modal__product-meta {
+  font-size: 13px;
+  color: #6b7c88;
+  margin-top: 4px;
+}
+
+.checkout-modal__price {
+  font-size: 15px;
+  font-weight: 600;
+  color: #162d3d;
+}
+
+.checkout-modal__total {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 16px;
+  color: #0c7ac0;
+}
+
+.checkout-modal__empty {
+  text-align: center;
+  color: #6b7c88;
+  font-size: 14px;
+}
+
+.checkout-modal__error {
+  background-color: rgba(201, 33, 39, 0.1);
+  color: #c92127;
+  padding: 10px 16px;
+  margin: 0 20px 12px 20px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.checkout-modal__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px 20px;
+  border-top: 1px solid #e5ebf0;
+  gap: 12px;
+}
+
+.checkout-modal__flush {
+  color: #c92127 !important;
+}

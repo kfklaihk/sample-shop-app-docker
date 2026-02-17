@@ -1,21 +1,27 @@
-FROM node:latest AS storefront
-WORKDIR /usr/src/atsea/app/react-app
-COPY react-app .
+# Stage 1: Build the React frontend
+FROM node:18-alpine AS frontend-build
+WORKDIR /react-build
+COPY app/react-app/package.json app/react-app/package-lock.json* ./
 RUN npm install
+COPY app/react-app/ ./
 RUN npm run build
 
-FROM maven:latest AS appserver
-WORKDIR /usr/src/atsea
-COPY pom.xml .
-RUN mvn -X -e -B -f pom.xml -s /usr/share/maven/ref/settings-docker.xml dependency:resolve
-COPY . .
-RUN mvn -X -e -B -s /usr/share/maven/ref/settings-docker.xml package -DskipTests
+# Stage 2: Build the Java backend
+FROM maven:3.8.8-eclipse-temurin-17 AS backend-build
+WORKDIR /app
+COPY app/pom.xml .
+RUN mvn dependency:go-offline -B
+COPY app/src ./src
+COPY --from=frontend-build /react-build/build ./src/main/resources/static
+RUN mvn package -DskipTests
 
-FROM openjdk:17-jdk-alpine 
+# Stage 3: Final runtime image
+FROM eclipse-temurin:17-jdk-alpine 
+RUN apk update && apk add --no-cache curl
 RUN  adduser -Dh /home/gordon gordon 
 WORKDIR /static
-COPY --from=storefront /usr/src/atsea/app/react-app/build/ .
+COPY --from=frontend-build /react-build/build/ .
 WORKDIR /app
-COPY --from=appserver /usr/src/atsea/target/AtSea-0.0.1-SNAPSHOT.jar .
+COPY --from=backend-build /app/target/AtSea-0.0.1-SNAPSHOT.jar .
 ENTRYPOINT ["java", "-jar", "/app/AtSea-0.0.1-SNAPSHOT.jar"]
 CMD ["--spring.profiles.active=postgres"]
