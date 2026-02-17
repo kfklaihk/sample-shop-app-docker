@@ -1,73 +1,45 @@
-![](atsea_store.png)
-#  AtSea Shop Demonstration Application
-
-<!-- CI Test: Testing GitHub Actions workflow with yarn cache fix -->
+#  AtSea Shop Enhanced Application
+## https://sample-shop-app-docker-production.up.railway.app/
 
 The AtSea Shop is a demonstration application comprised of: 
 
-* Java REST application written using Spring-Boot, 
-* a database for product inventory, customer data, and orders,
-* a React shopping cart,
+* Java REST application backend written using Spring-Boot, 
+* a Postgres database for product inventory, customer data, and orders,
+* a React shopping cart
 * a NGINX reverse proxy implementing https,
-* a payment gateway to simulate certificate management
+* a payment gateway to simulate certificate management , not processing order
 
-# Requirements
+My enhancements
+* add login and signup page
+* add products for selection
+* modify shopping cart to send order to payment gateway
+* add redis to cache shopping cart
+* add rabbit mq to facilitate order flow
+* modify payment gateway to process order
+* add screening logic and email order confirmation to payment gateway
+* add api/health monitor
+* cloud version
+# Login screen
+<img width="579" height="527" alt="image" src="https://github.com/user-attachments/assets/09c12c4d-f273-4d59-a158-24b39cb6867f" />
 
-This example uses features in Docker 17.05 CE Edge. Install this version to run the example.
+# Main Page
+<img width="908" height="620" alt="image" src="https://github.com/user-attachments/assets/a26143b5-ecd7-41b2-8606-89974afe472b" />
 
-# Building and Running the AtSea Shop
+# More Products
+<img width="827" height="617" alt="image" src="https://github.com/user-attachments/assets/1f1a656e-4d1d-4fcb-8c11-4f4c657fe7d9" />
 
-## Secrets
+# Modified Shopping Cart
+<img width="539" height="457" alt="image" src="https://github.com/user-attachments/assets/6f28e15b-7f81-46b7-a5ab-c9377e28c9d7" />
 
-This application uses Docker secrets to secure the application components. The reverse proxy requires creating a certificate that is stored as a secret and the payment also requires a password stored as a secret. To create a certificate and add as a secret:
+# Email Confirmation from Payment Gateway
+<img width="641" height="412" alt="image" src="https://github.com/user-attachments/assets/0d578836-c238-4ca8-acfa-20f3ce15e7c2" />
 
-```
-mkdir certs
-
-openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -x509 -days 365 -out certs/domain.crt
-
-docker secret create revprox_cert certs/domain.crt
-
-docker secret create revprox_key certs/domain.key
-
-docker secret create postgres_password certs/domain.key
-```
-
-To create a secret for staging the payment gateway:
-
-```
-echo staging | docker secret create staging_token - 
-```
-
-## Run as an application
-
-To run the AtSea shop as an application:
-```
-docker-compose up --build
-```
-
-## Deploy to a swarm
-```
-#If you need to create a Swarm
-docker swarm init
-docker stack deploy -c docker-stack.yml atsea
-```
-
-## A simplified development environment
-This compose file creates a simplified development environment consisting of only the application server and the database.
-
-```
-docker-compose --file docker-compose-dev.yml up --build
-```
+# Cloud Architecture
+<img width="757" height="515" alt="image" src="https://github.com/user-attachments/assets/a7b480f2-ee82-470e-af38-3171ccac3de6" />
 
 
 
-## The AtSea Shop 
 
-The URL for the content is `http://localhost:8080/`
 
-# REST API
-
-Documentation for REST calls: [REST API](./REST.md)
 
 
